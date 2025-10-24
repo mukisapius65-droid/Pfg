@@ -605,3 +605,65 @@ function generateOrderMessage() {
 document.addEventListener('DOMContentLoaded', function() {
     setupWhatsAppOrder();
 });
+// Fix Checkout Button Functionality
+function setupCheckoutButton() {
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    
+    checkoutBtn.addEventListener('click', function() {
+        if (cart.length === 0) {
+            showMessage('Your cart is empty! Please add some items first.', 'error');
+            return;
+        }
+        
+        // Get delivery address
+        const deliveryAddress = document.getElementById('deliveryAddress')?.value || 
+                               localStorage.getItem('userLocation') || 
+                               'Location not specified';
+        
+        if (deliveryAddress === 'Location not specified') {
+            showMessage('Please enter your delivery location!', 'error');
+            document.getElementById('deliveryAddress')?.focus();
+            return;
+        }
+        
+        // Process the order
+        processCheckoutOrder(deliveryAddress);
+    });
+}
+
+function processCheckoutOrder(deliveryAddress) {
+    showLoading();
+    
+    // Simulate order processing
+    setTimeout(() => {
+        hideLoading();
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        // Show order confirmation
+        const orderDetails = cart.map(item => 
+            `${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX`
+        ).join('\n');
+        
+        const confirmationMessage = `Order Confirmed! 🎉\n\nItems:\n${orderDetails}\n\nTotal: ${total.toLocaleString()} UGX\nDelivery: ${deliveryAddress}\n\nWe will call you at +256703055329 to confirm your order!`;
+        
+        alert(confirmationMessage);
+        
+        // Clear cart and close sidebar
+        cart = [];
+        updateCart();
+        cartSidebar.classList.remove('active');
+        overlay.classList.remove('active');
+        
+        showMessage('Order placed successfully! We will call you shortly.', 'success');
+        
+        // Track the order
+        trackEvent('Order', 'Checkout', `Items: ${cart.length}, Total: ${total}`);
+        
+    }, 1500);
+}
+
+// Initialize checkout button when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setupCheckoutButton();
+});
