@@ -540,3 +540,68 @@ function processOrder(orderData) {
     cartSidebar.classList.remove('active');
     overlay.classList.remove('active');
 }
+// Enhanced WhatsApp Order System
+function setupWhatsAppOrder() {
+    const whatsappButtons = document.querySelectorAll('.whatsapp-float, .whatsapp-hero-btn, .whatsapp-large-btn');
+    
+    whatsappButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            // If it's the floating button, check cart
+            if (this.classList.contains('whatsapp-float') && cart.length === 0) {
+                e.preventDefault();
+                showMessage('Please add items to your cart first!', 'error');
+                // Scroll to menu section
+                document.getElementById('menu').scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+            
+            // Generate order message if cart has items
+            if (cart.length > 0) {
+                e.preventDefault();
+                const orderMessage = generateOrderMessage();
+                const encodedMessage = encodeURIComponent(orderMessage);
+                const whatsappUrl = `https://wa.me/256703055329?text=${encodedMessage}`;
+                
+                window.open(whatsappUrl, '_blank');
+                
+                // Track the order
+                trackEvent('Order', 'WhatsApp Order', `From: ${this.className}, Items: ${cart.length}`);
+            }
+            // If cart is empty but it's a CTA button, let it proceed with basic message
+        });
+    });
+}
+
+// Enhanced order message with location
+function generateOrderMessage() {
+    const deliveryAddress = document.getElementById('deliveryAddress')?.value || 
+                           localStorage.getItem('userLocation') || 
+                           '📍 Please specify delivery location';
+    
+    let message = "🥞 *PFG CHAPATI ORDER* 🥞\\n\\n";
+    message += "Hello! I would like to order:\\n\\n";
+    
+    if (cart.length > 0) {
+        cart.forEach((item, index) => {
+            message += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX\\n`;
+        });
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        message += `\\n💰 *Total: ${total.toLocaleString()} UGX*`;
+    } else {
+        message += "Please help me with the menu and prices.\\n";
+    }
+    
+    message += `\\n📍 *Delivery Location:* ${deliveryAddress}`;
+    message += `\\n👤 *Customer Name:* `;
+    message += `\\n📞 *Phone Number:* `;
+    message += `\\n💬 *Special Instructions:* `;
+    message += `\\n\\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
+    
+    return message;
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setupWhatsAppOrder();
+});
