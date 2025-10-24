@@ -818,29 +818,31 @@ footer {
     align-items: center;
     background-color: #25D366;
     color: white;
-    padding: 15px 25px;
+    padding: 18px 28px;
     border-radius: 50px;
     text-decoration: none;
     font-weight: bold;
-    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
     transition: all 0.3s ease;
     animation: whatsapp-pulse 2s infinite;
+    font-size: 18px;
 }
 
 .whatsapp-float:hover {
     background-color: #128C7E;
     transform: scale(1.05);
-    box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
     color: white;
 }
 
 .whatsapp-float i {
-    font-size: 24px;
-    margin-right: 10px;
+    font-size: 28px;
+    margin-right: 12px;
 }
 
 .whatsapp-text {
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 @keyframes whatsapp-pulse {
@@ -848,14 +850,14 @@ footer {
         box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
     }
     70% {
-        box-shadow: 0 0 0 10px rgba(37, 211, 102, 0);
+        box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
     }
     100% {
         box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
     }
 }
 
-/* Responsive WhatsApp Button */
+/* Responsive WhatsApp Button - LARGER on Mobile */
 @media (max-width: 768px) {
     .whatsapp-order-btn {
         bottom: 100px;
@@ -863,16 +865,19 @@ footer {
     }
     
     .whatsapp-float {
-        padding: 12px 20px;
+        padding: 20px 30px;
+        font-size: 20px;
+        border-radius: 60px;
     }
     
     .whatsapp-text {
-        font-size: 14px;
+        font-size: 20px;
+        font-weight: 700;
     }
     
     .whatsapp-float i {
-        font-size: 20px;
-        margin-right: 8px;
+        font-size: 32px;
+        margin-right: 15px;
     }
 }
 
@@ -880,18 +885,96 @@ footer {
     .whatsapp-order-btn {
         bottom: 90px;
         right: 15px;
+        left: 15px; /* Center on very small screens */
+        display: flex;
+        justify-content: center;
     }
     
     .whatsapp-float {
-        padding: 10px 16px;
+        padding: 22px 35px;
+        font-size: 22px;
+        border-radius: 65px;
+        min-width: 280px;
+        justify-content: center;
     }
     
     .whatsapp-text {
-        display: none; /* Hide text on very small screens */
+        font-size: 22px;
+        display: block !important; /* Always show text on mobile */
+        font-weight: 700;
     }
     
     .whatsapp-float i {
-        margin-right: 0;
-        font-size: 24px;
+        font-size: 36px;
+        margin-right: 15px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 400px) {
+    .whatsapp-order-btn {
+        bottom: 80px;
+        right: 10px;
+        left: 10px;
+    }
+    
+    .whatsapp-float {
+        padding: 20px 25px;
+        font-size: 20px;
+        min-width: 250px;
+    }
+    
+    .whatsapp-text {
+        font-size: 20px;
+    }
+    
+    .whatsapp-float i {
+        font-size: 32px;
+    }
+}
+
+/* WhatsApp Cart Button - Also make larger */
+.whatsapp-cart-order {
+    margin-top: 20px;
+}
+
+.whatsapp-cart-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #25D366;
+    color: white;
+    padding: 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    gap: 12px;
+    font-size: 18px;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+}
+
+.whatsapp-cart-btn:hover {
+    background-color: #128C7E;
+    color: white;
+    transform: scale(1.02);
+}
+
+.whatsapp-cart-btn i {
+    font-size: 24px;
+}
+
+/* Mobile styles for cart button */
+@media (max-width: 768px) {
+    .whatsapp-cart-btn {
+        padding: 20px;
+        font-size: 20px;
+        border-radius: 10px;
+    }
+    
+    .whatsapp-cart-btn i {
+        font-size: 26px;
     }
 }
