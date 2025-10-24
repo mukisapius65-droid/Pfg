@@ -540,37 +540,3 @@ function processOrder(orderData) {
     cartSidebar.classList.remove('active');
     overlay.classList.remove('active');
 }
-// api/orders.js
-export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { customerName, phone, location, items, total } = req.body;
-    
-    // Save to database or send notification
-    console.log('New Order:', {
-      customerName,
-      phone, 
-      location,
-      items,
-      total,
-      timestamp: new Date().toISOString()
-    });
-    
-    // Send WhatsApp notification to yourself
-    await sendWhatsAppNotification({
-      customerName,
-      phone,
-      location,
-      items,
-      total
-    });
-    
-    res.status(200).json({ success: true, message: 'Order received!' });
-  }
-}
-
-async function sendWhatsAppNotification(order) {
-  // Using WhatsApp API or Twilio
-  const message = `NEW ORDER!\\nCustomer: ${order.customerName}\\nPhone: ${order.phone}\\nLocation: ${order.location}\\nTotal: ${order.total} UGX`;
-  
-  // This would send you a WhatsApp message for each new order
-}
