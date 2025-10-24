@@ -369,3 +369,17 @@ const customerInfo = {
     location: 'required',
     deliveryInstructions: 'optional'
 };
+const marketingStrategy = {
+    online: [
+        'Share on local Facebook groups',
+        'WhatsApp status updates',
+        'Instagram food pages',
+        'Google My Business listing'
+    ],
+    offline: [
+        'Flyers in Busega area',
+        'Word of mouth referrals',
+        'Local radio ads (if budget allows)',
+        'Partnership with nearby businesses'
+    ]
+};
