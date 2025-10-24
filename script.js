@@ -394,3 +394,9 @@ const optimizeImages = async () => {
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
 }
+// Basic success metrics
+const metrics = {
+    daily: ['orders', 'revenue', 'new customers'],
+    weekly: ['repeat customers', 'popular items', 'delivery times'],
+    monthly: ['growth rate', 'customer satisfaction', 'profit margins']
+};
