@@ -193,6 +193,48 @@
                 </div>
             </div>
         </div>
+        <!-- Cart Sidebar -->
+<div class="cart-sidebar">
+    <div class="cart-header">
+        <h2>Your Order</h2>
+        <button class="close-cart">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="cart-items">
+        <!-- Cart items will be added here dynamically -->
+    </div>
+    
+    <div class="cart-total">
+        <span>Total:</span>
+        <span class="total-amount">0 UGX</span>
+    </div>
+    
+    <!-- Location Section -->
+    <div class="location-section">
+        <div class="location-header">
+            <h4>📍 Delivery Location</h4>
+            <button class="detect-location-btn" id="detectLocationBtn">
+                <i class="fas fa-location-arrow"></i>
+                Detect My Location
+            </button>
+        </div>
+        <div class="location-input">
+            <textarea 
+                id="deliveryAddress" 
+                placeholder="Enter your delivery address or click above to detect automatically"
+                rows="3"
+            ></textarea>
+        </div>
+    </div>
+    
+    <!-- Checkout Button -->
+    <button class="checkout-btn">
+        <i class="fas fa-credit-card"></i>
+        Proceed to Checkout
+    </button>
+</div>
         <!-- In your cart sidebar -->
 <div class="order-options">
     <button class="checkout-btn" id="checkoutBtn">
