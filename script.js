@@ -352,3 +352,20 @@ document.querySelectorAll('a[href^="tel:"]').forEach(link => {
 document.querySelector('.call-now').addEventListener('click', () => {
     trackEvent('Contact', 'Phone Call', 'Floating Button');
 });
+// Add to script.js - Real order submission
+async function submitOrder(orderData) {
+    const response = await fetch('your-backend-url/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+    });
+    return await response.json();
+}
+
+// Form data to collect:
+const customerInfo = {
+    name: 'required',
+    phone: 'required', 
+    location: 'required',
+    deliveryInstructions: 'optional'
+};
