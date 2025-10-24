@@ -400,44 +400,86 @@ const metrics = {
     weekly: ['repeat customers', 'popular items', 'delivery times'],
     monthly: ['growth rate', 'customer satisfaction', 'profit margins']
 };
-// Enhanced WhatsApp Order Functionality
+// Enhanced WhatsApp Order Functionality with Mobile Optimization
 function setupWhatsAppOrder() {
-    const whatsappBtn = document.querySelector('.whatsapp-float');
+    const whatsappFloat = document.querySelector('.whatsapp-float');
+    const whatsappCartBtn = document.getElementById('whatsappCartBtn');
     
-    whatsappBtn.addEventListener('click', function(e) {
+    // Floating button functionality
+    whatsappFloat.addEventListener('click', function(e) {
         if (cart.length === 0) {
             e.preventDefault();
             showMessage('Please add items to your cart first!', 'error');
-            // Open cart sidebar
             cartSidebar.classList.add('active');
             overlay.classList.add('active');
             return;
         }
         
-        // Generate order message with cart items
         const orderMessage = generateOrderMessage();
         const encodedMessage = encodeURIComponent(orderMessage);
         this.href = `https://wa.me/256703055329?text=${encodedMessage}`;
+        
+        // Track WhatsApp order click
+        trackEvent('Order', 'WhatsApp Order', `Items: ${cart.length}`);
+    });
+    
+    // Cart button functionality
+    whatsappCartBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        if (cart.length === 0) {
+            showMessage('Your cart is empty! Please add some items first.', 'error');
+            return;
+        }
+        
+        const orderMessage = generateOrderMessage();
+        const encodedMessage = encodeURIComponent(orderMessage);
+        const whatsappUrl = `https://wa.me/256703055329?text=${encodedMessage}`;
+        
+        // Open WhatsApp
+        window.open(whatsappUrl, '_blank');
+        
+        // Close cart sidebar on mobile
+        if (window.innerWidth <= 768) {
+            cartSidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+        
+        showMessage('Opening WhatsApp with your order! 📱', 'success');
+        
+        // Track cart WhatsApp order
+        trackEvent('Order', 'Cart WhatsApp Order', `Items: ${cart.length}`);
     });
 }
 
 function generateOrderMessage() {
-    let message = "Hello PFG Chapati! I would like to order:\n\n";
+    let message = "🥞 *PFG CHAPATI ORDER* 🥞\n\n";
+    message += "Hello! I would like to order:\n\n";
     
-    cart.forEach(item => {
-        message += `• ${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX\n`;
+    // Add all cart items
+    cart.forEach((item, index) => {
+        message += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX\n`;
     });
     
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    message += `\nTotal: ${total.toLocaleString()} UGX`;
-    message += `\n\nDelivery Location: `;
-    message += `\nCustomer Name: `;
-    message += `\nPhone Number: `;
+    message += `\n💰 *Total: ${total.toLocaleString()} UGX*`;
+    message += `\n\nPlease provide:\n📍 Delivery Location: \n👤 Customer Name: \n📞 Phone Number: \n💬 Special Instructions: `;
+    message += `\n\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
     
     return message;
 }
 
-// Initialize WhatsApp order functionality
+// Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
     setupWhatsAppOrder();
+    
+    // Add touch feedback for mobile
+    const whatsappBtn = document.querySelector('.whatsapp-float');
+    whatsappBtn.addEventListener('touchstart', function() {
+        this.style.transform = 'scale(0.95)';
+    });
+    
+    whatsappBtn.addEventListener('touchend', function() {
+        this.style.transform = 'scale(1)';
+    });
 });
