@@ -483,3 +483,60 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.transform = 'scale(1)';
     });
 });
+// Enhanced order management
+function setupOrderSystem() {
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const whatsappBtn = document.getElementById('whatsappCartBtn');
+    
+    checkoutBtn.addEventListener('click', function() {
+        showOrderForm();
+    });
+    
+    whatsappBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (cart.length === 0) {
+            showMessage('Your cart is empty!', 'error');
+            return;
+        }
+        
+        const orderMessage = generateOrderMessage();
+        const whatsappUrl = `https://wa.me/256703055329?text=${encodeURIComponent(orderMessage)}`;
+        window.open(whatsappUrl, '_blank');
+        
+        // Clear cart after order
+        setTimeout(() => {
+            cart = [];
+            updateCart();
+            showMessage('Order sent via WhatsApp! We will confirm soon.', 'success');
+        }, 1000);
+    });
+}
+
+function showOrderForm() {
+    // Simple form for customer details
+    const name = prompt('Please enter your name:');
+    if (!name) return;
+    
+    const phone = prompt('Please enter your phone number:');
+    if (!phone) return;
+    
+    const location = prompt('Please enter your delivery location:');
+    if (!location) return;
+    
+    // Process order
+    processOrder({ name, phone, location, items: cart });
+}
+
+function processOrder(orderData) {
+    // Here you would normally send to your backend
+    // For now, just show confirmation
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    alert(`Order Confirmed!\\n\\nName: ${orderData.name}\\nPhone: ${orderData.phone}\\nLocation: ${orderData.location}\\nTotal: ${total.toLocaleString()} UGX\\n\\nWe will call you to confirm delivery!`);
+    
+    // Clear cart
+    cart = [];
+    updateCart();
+    cartSidebar.classList.remove('active');
+    overlay.classList.remove('active');
+}
