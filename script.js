@@ -400,3 +400,44 @@ const metrics = {
     weekly: ['repeat customers', 'popular items', 'delivery times'],
     monthly: ['growth rate', 'customer satisfaction', 'profit margins']
 };
+// Enhanced WhatsApp Order Functionality
+function setupWhatsAppOrder() {
+    const whatsappBtn = document.querySelector('.whatsapp-float');
+    
+    whatsappBtn.addEventListener('click', function(e) {
+        if (cart.length === 0) {
+            e.preventDefault();
+            showMessage('Please add items to your cart first!', 'error');
+            // Open cart sidebar
+            cartSidebar.classList.add('active');
+            overlay.classList.add('active');
+            return;
+        }
+        
+        // Generate order message with cart items
+        const orderMessage = generateOrderMessage();
+        const encodedMessage = encodeURIComponent(orderMessage);
+        this.href = `https://wa.me/256703055329?text=${encodedMessage}`;
+    });
+}
+
+function generateOrderMessage() {
+    let message = "Hello PFG Chapati! I would like to order:\n\n";
+    
+    cart.forEach(item => {
+        message += `• ${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX\n`;
+    });
+    
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    message += `\nTotal: ${total.toLocaleString()} UGX`;
+    message += `\n\nDelivery Location: `;
+    message += `\nCustomer Name: `;
+    message += `\nPhone Number: `;
+    
+    return message;
+}
+
+// Initialize WhatsApp order functionality
+document.addEventListener('DOMContentLoaded', function() {
+    setupWhatsAppOrder();
+});
