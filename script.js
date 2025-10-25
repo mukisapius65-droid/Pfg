@@ -584,25 +584,25 @@ function generateOrderMessage() {
                            localStorage.getItem('userLocation') || 
                            '📍 Please specify delivery location';
     
-    let message = "🥞 *PFG CHAPATI ORDER* 🥞\\n\\n";
-    message += "Hello! I would like to order:\\n\\n";
+    let message = "🥞 *PFG CHAPATI ORDER* 🥞\n";
+    message += "Hello! I would like to order:\n";
     
     if (cart.length > 0) {
         cart.forEach((item, index) => {
-            message += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX\\n`;
+            message += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX\n`;
         });
         
         const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        message += `\\n💰 *Total: ${total.toLocaleString()} UGX*`;
+        message += `\n💰 *Total: ${total.toLocaleString()} UGX*`;
     } else {
-        message += "Please help me with the menu and prices.\\n";
+        message += "Please help me with the menu and prices.\n";
     }
     
-    message += `\\n📍 *Delivery Location:* ${deliveryAddress}`;
-    message += `\\n👤 *Customer Name:* `;
-    message += `\\n📞 *Phone Number:* `;
-    message += `\\n💬 *Special Instructions:* `;
-    message += `\\n\\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
+    message += `\n📍 *Delivery Location:* ${deliveryAddress}`;
+    message += `\n👤 *Customer Name:* `;
+    message += `\n📞 *Phone Number:* `;
+    message += `\n💬 *Special Instructions:* `;
+    message += `\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
     
     return message;
 }
