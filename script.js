@@ -453,18 +453,24 @@ function setupWhatsAppOrder() {
 }
 
 function generateOrderMessage() {
-    let message = "🥞 *PFG CHAPATI ORDER* 🥞\n\n";
-    message += "Hello! I would like to order:\n\n";
+    const deliveryAddress = deliveryAddressInput?.value || 
+                           localStorage.getItem('userLocation') || 
+                           '📍 Please specify delivery location';
     
-    // Add all cart items
+    let message = "🥞 *PFG CHAPATI ORDER* 🥞\n\n";  // ← CHANGED
+    message += "Hello! I would like to order:\n\n";  // ← CHANGED
+    
     cart.forEach((item, index) => {
-        message += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX\n`;
+        message += `${index + 1}. ${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX\n`;  // ← CHANGED
     });
     
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    message += `\n💰 *Total: ${total.toLocaleString()} UGX*`;
-    message += `\n\nPlease provide:\n📍 Delivery Location: \n👤 Customer Name: \n📞 Phone Number: \n💬 Special Instructions: `;
-    message += `\n\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
+    message += `\n💰 *Total: ${total.toLocaleString()} UGX*`;  // ← CHANGED
+    message += `\n\n📍 *Delivery Location:* ${deliveryAddress}`;  // ← CHANGED
+    message += `\n👤 *Customer Name:* `;  // ← CHANGED
+    message += `\n📞 *Phone Number:* `;  // ← CHANGED
+    message += `\n💬 *Special Instructions:* `;  // ← CHANGED
+    message += `\n\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;  // ← CHANGED
     
     return message;
 }
