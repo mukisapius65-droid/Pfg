@@ -1,19 +1,3 @@
-// ===== SIMPLE BACK BUTTON =====
-function initializeBackButton() {
-    const backButton = document.querySelector('.back-button');
-    
-    if (backButton) {
-        backButton.addEventListener('click', function() {
-            closeCartSidebar();
-        });
-    }
-}
-
-// Add to your DOMContentLoaded function
-document.addEventListener('DOMContentLoaded', function() {
-    // ... your other initializations
-    initializeBackButton(); // Add this line
-});
 // Mobile Menu Toggle
 const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
 const navLinks = document.querySelector('.nav-links');
@@ -688,4 +672,20 @@ function processCheckoutOrder(deliveryAddress) {
 // Initialize checkout button when page loads
 document.addEventListener('DOMContentLoaded', function() {
     setupCheckoutButton();
+});
+// ===== SIMPLE BACK BUTTON =====
+function initializeBackButton() {
+    const backButton = document.querySelector('.back-button');
+    
+    if (backButton) {
+        backButton.addEventListener('click', function() {
+            closeCartSidebar();
+        });
+    }
+}
+
+// Add to your DOMContentLoaded function
+document.addEventListener('DOMContentLoaded', function() {
+    // ... your other initializations
+    initializeBackButton(); // Add this line
 });
