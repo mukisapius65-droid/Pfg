@@ -135,12 +135,13 @@
                             <button class="add-to-cart" data-id="1" data-name="Chapati Plain" data-price="1500" data-image="https://images.unsplash.com/photo-1631452180519-c014fe946bc7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80">Add to Cart</button>
                         </div>
                     </div>
-                <!-- Kikomando Menu Item with Fallback -->
+                <!-- Kikomando - Guaranteed Working Version -->
 <div class="menu-item">
     <img src="https://res.cloudinary.com/dxd5hibh7/image/upload/v1761353925/kikomando_vizan6.jpg" 
-         onerror="this.src='https://images.unsplash.com/photo-1565299585323-38174c13fae8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300&q=80'"
+         onerror="handleImageError(this)"
          alt="Kikomando" 
-         loading="lazy">
+         loading="lazy"
+         style="min-height: 200px; object-fit: cover;">
     <div class="menu-item-content">
         <h3>Kikomando</h3>
         <p>Chapati served with delicious beans, a popular and filling Ugandan street food.</p>
