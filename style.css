@@ -1214,3 +1214,27 @@ footer {
         margin-right: 8px;
     }
 }
+/* Simple mobile close solution */
+@media (max-width: 768px) {
+    .cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+    }
+    
+    .cart-header h2 {
+        flex: 1;
+        text-align: center;
+        margin: 0;
+    }
+    
+    .back-button, 
+    .close-cart {
+        min-width: 44px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
