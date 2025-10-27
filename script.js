@@ -689,3 +689,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // ... your other initializations
     initializeBackButton(); // Add this line
 });
+// Debug security issues
+function debugSecurityIssues() {
+    console.log('=== SECURITY DEBUG INFO ===');
+    console.log('Protocol:', window.location.protocol);
+    console.log('Host:', window.location.host);
+    
+    // Check all images
+    const images = document.querySelectorAll('img');
+    images.forEach((img, index) => {
+        console.log(`Image ${index}:`, img.src);
+        
+        const testImg = new Image();
+        testImg.onload = () => console.log(`✅ Image ${index} loads OK`);
+        testImg.onerror = () => console.log(`❌ Image ${index} FAILED: ${img.src}`);
+        testImg.src = img.src;
+    });
+}
+
+document.addEventListener('DOMContentLoaded', debugSecurityIssues);
