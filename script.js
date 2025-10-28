@@ -907,3 +907,41 @@ function generateOrderMessage() {
     
     return message;
 }
+function generateOrderMessage() {
+    const customerName = document.getElementById('customerName')?.value || 'Not provided';
+    const customerPhone = document.getElementById('customerPhone')?.value || 'Not provided';
+    const customerEmail = document.getElementById('customerEmail')?.value || '';
+    const deliveryAddress = document.getElementById('deliveryAddress')?.value || 'Not provided';
+    const specialInstructions = document.getElementById('specialInstructions')?.value || '';
+    
+    let message = "🥞 *PFG CHAPATI ORDER* 🥞\n\n";
+    message += "Hello! I would like to order:\n\n";
+    
+    if (cart.length > 0) {
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            message += `${index + 1}. ${item.name} x${item.quantity} - ${itemTotal.toLocaleString()} UGX\n`;
+        });
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        message += `\n💰 *Total: ${total.toLocaleString()} UGX*`;
+    } else {
+        message += "Please help me with the menu and prices.\n";
+    }
+    
+    message += `\n\n👤 *Customer Information:*`;
+    message += `\n📛 Name: ${customerName}`;
+    message += `\n📞 Phone: ${customerPhone}`;
+    if (customerEmail) {
+        message += `\n📧 Email: ${customerEmail}`;
+    }
+    message += `\n📍 Delivery: ${deliveryAddress}`;
+    if (specialInstructions) {
+        message += `\n💬 Instructions: ${specialInstructions}`;
+    }
+    
+    message += `\n\n_Ordered via PFG Chapati Website_`;
+    message += `\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
+    
+    return message;
+}
