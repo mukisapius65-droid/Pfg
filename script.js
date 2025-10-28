@@ -945,3 +945,121 @@ function generateOrderMessage() {
     
     return message;
 }
+// ===== ENHANCED ADMIN PANEL =====
+function showEnhancedAdminPanel() {
+    const stats = getWhatsAppNumberStats();
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString();
+    
+    const message = 
+        `📊 PFG CHAPATI ADMIN PANEL\n` +
+        `⏰ ${timeStr}\n\n` +
+        `📱 WHATSAPP NUMBERS:\n` +
+        `Total: ${stats.totalNumbers} numbers\n` +
+        `Active: ${stats.available} available\n` +
+        `Used: ${stats.recentlyUsed} recently\n\n` +
+        `🔢 NUMBER STATUS:\n${whatsappNumbers.map((num, index) => 
+            `${index + 1}. ${getNumberDisplay(num)} ${usedNumbers.includes(num) ? '🔴 Recently Used' : '🟢 Available'}`
+        ).join('\n')}\n\n` +
+        `🛒 CART STATUS:\n` +
+        `Items: ${cart.length}\n` +
+        `Total: ${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()} UGX`;
+    
+    // Create a nice admin panel instead of alert
+    const adminDiv = document.createElement('div');
+    adminDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 10000;
+        max-width: 400px;
+        font-family: Arial, sans-serif;
+        border: 3px solid var(--primary-color);
+    `;
+    
+    adminDiv.innerHTML = `
+        <div style="text-align: center; margin-bottom: 15px;">
+            <h3 style="color: var(--primary-color); margin: 0 0 10px 0;">PFG Chapati Admin</h3>
+            <small style="color: #666;">${timeStr}</small>
+        </div>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+            <h4 style="margin: 0 0 10px 0; color: #333;">📱 WhatsApp Numbers</h4>
+            <div style="font-size: 12px; line-height: 1.4;">
+                <div>Total: <strong>${stats.totalNumbers}</strong> numbers</div>
+                <div>Available: <strong style="color: green;">${stats.available}</strong></div>
+                <div>Recently used: <strong style="color: red;">${stats.recentlyUsed}</strong></div>
+            </div>
+        </div>
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+            <h4 style="margin: 0 0 10px 0; color: #333;">🔢 Number Status</h4>
+            <div style="font-size: 11px; line-height: 1.6;">
+                ${whatsappNumbers.map((num, index) => `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                        <span>${index + 1}. ${getNumberDisplay(num)}</span>
+                        <span style="color: ${usedNumbers.includes(num) ? 'red' : 'green'}; font-weight: bold;">
+                            ${usedNumbers.includes(num) ? '🔴 Used' : '🟢 Available'}
+                        </span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <button onclick="this.parentElement.parentElement.remove()" style="
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 8px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+            ">Close</button>
+            <button onclick="resetNumberRotation()" style="
+                background: #6c757d;
+                color: white;
+                border: none;
+                padding: 8px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-left: 10px;
+            ">Reset Rotation</button>
+        </div>
+    `;
+    
+    document.body.appendChild(adminDiv);
+    
+    // Add overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+    `;
+    overlay.onclick = () => {
+        adminDiv.remove();
+        overlay.remove();
+    };
+    document.body.appendChild(overlay);
+}
+
+function resetNumberRotation() {
+    usedNumbers = [];
+    localStorage.setItem('pfgChapatiUsedNumbers', JSON.stringify(usedNumbers));
+    showMessage('🔄 WhatsApp number rotation reset!', 'success');
+    setTimeout(() => location.reload(), 1000);
+}
+
+// Update the keyboard shortcut
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'W') {
+        e.preventDefault();
+        showEnhancedAdminPanel();
+    }
+});
