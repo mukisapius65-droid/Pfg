@@ -812,3 +812,20 @@ function addEnhancedWhatsAppButton() {
 }
 
 document.addEventListener('DOMContentLoaded', addEnhancedWhatsAppButton);
+    // ===== QUICK FIX FOR EXISTING CART =====
+function fixCartResponsiveness() {
+    // Remove any duplicate buttons
+    const duplicateButtons = document.querySelectorAll('.whatsapp-cart-btn, .mobile-close-btn');
+    duplicateButtons.forEach(btn => btn.remove());
+    
+    // Re-initialize functionality
+    initializeCartFunctionality();
+    initializeWhatsAppCartButton();
+    initializeMobileClose();
+    
+    // Force update cart display
+    updateCart();
+}
+
+// Re-run after DOM changes
+setTimeout(fixCartResponsiveness, 100);
