@@ -2,7 +2,7 @@
 console.log('🚀 PFG Chapati JS Initializing...');
 
 // ===== GLOBAL VARIABLES =====
-let cart = [];
+let cart = JSON.parse(localStorage.getItem('pfgChapatiCart')) || [];
 let isCartOpen = false;
 
 // ===== DOM ELEMENTS =====
@@ -10,7 +10,7 @@ const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
 const navLinks = document.querySelector('.nav-links');
 const cartIcon = document.querySelector('.cart-icon');
 const cartSidebar = document.querySelector('.cart-sidebar');
-const closeCart = document.querySelector('.close-cart');
+const closeCartBtn = document.querySelector('.close-cart');
 const overlay = document.querySelector('.overlay');
 const addToCartButtons = document.querySelectorAll('.add-to-cart');
 const cartItemsContainer = document.querySelector('.cart-items');
@@ -21,25 +21,6 @@ const loadingSpinner = document.getElementById('loadingSpinner');
 const deliveryAddressInput = document.getElementById('deliveryAddress');
 const detectLocationBtn = document.getElementById('detectLocationBtn');
 const whatsappCartBtn = document.getElementById('whatsappCartBtn');
-
-// ===== DEBUG: CHECK ELEMENT EXISTENCE =====
-console.log('🔍 Element Check:', {
-    mobileMenuBtn: !!mobileMenuBtn,
-    navLinks: !!navLinks,
-    cartIcon: !!cartIcon,
-    cartSidebar: !!cartSidebar,
-    closeCart: !!closeCart,
-    overlay: !!overlay,
-    addToCartButtons: addToCartButtons.length,
-    cartItemsContainer: !!cartItemsContainer,
-    cartCount: !!cartCount,
-    totalAmount: !!totalAmount,
-    checkoutBtn: !!checkoutBtn,
-    loadingSpinner: !!loadingSpinner,
-    deliveryAddressInput: !!deliveryAddressInput,
-    detectLocationBtn: !!detectLocationBtn,
-    whatsappCartBtn: !!whatsappCartBtn
-});
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -53,8 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeImageLoading();
     initializeLocationDetection();
     
-    // Load cart from localStorage if available
-    loadCartFromStorage();
+    updateCart();
     
     console.log('✅ All Features Initialized');
 });
@@ -94,32 +74,32 @@ function initializeMobileMenu() {
 function initializeCartSystem() {
     console.log('🛒 Initializing Cart System...');
     
-    // Check if required elements exist
-    if (!cartIcon || !cartSidebar || !closeCart || !overlay) {
-        console.error('❌ Critical cart elements missing');
-        return;
+    // Cart Icon Click
+    if (cartIcon) {
+        cartIcon.addEventListener('click', openCart);
+        console.log('✅ Cart icon event listener added');
     }
     
-    // Cart Icon Click
-    cartIcon.addEventListener('click', openCart);
-    console.log('✅ Cart icon event listener added');
-    
     // Close Cart Button
-    closeCart.addEventListener('click', closeCart);
-    console.log('✅ Close cart event listener added');
+    if (closeCartBtn) {
+        closeCartBtn.addEventListener('click', closeCart);
+        console.log('✅ Close cart event listener added');
+    }
     
     // Overlay Click
-    overlay.addEventListener('click', closeCart);
-    console.log('✅ Overlay event listener added');
+    if (overlay) {
+        overlay.addEventListener('click', closeCart);
+        console.log('✅ Overlay event listener added');
+    }
     
     // Add to Cart Buttons
-    if (addToCartButtons.length === 0) {
-        console.warn('⚠️ No add-to-cart buttons found');
-    } else {
+    if (addToCartButtons.length > 0) {
         addToCartButtons.forEach((button, index) => {
             button.addEventListener('click', handleAddToCart);
             console.log(`✅ Add to cart button ${index + 1} initialized`);
         });
+    } else {
+        console.warn('⚠️ No add-to-cart buttons found');
     }
     
     // Escape key to close cart
@@ -128,8 +108,6 @@ function initializeCartSystem() {
             closeCart();
         }
     });
-    
-    console.log('✅ Cart System Initialized');
 }
 
 function handleAddToCart(e) {
@@ -145,13 +123,6 @@ function handleAddToCart(e) {
     const image = button.getAttribute('data-image');
     
     console.log('📦 Product Details:', { id, name, price, image });
-    
-    // Validate data
-    if (!id || !name || !price || !image) {
-        console.error('❌ Missing product data');
-        showMessage('Error adding item to cart. Please try again.', 'error');
-        return;
-    }
     
     // Check if item already exists in cart
     const existingItemIndex = cart.findIndex(item => item.id === id);
@@ -175,41 +146,24 @@ function handleAddToCart(e) {
     updateCart();
     openCart();
     showMessage(`✅ ${name} added to cart!`, 'success');
-    
-    // Track analytics
-    trackEvent('Products', 'Add to Cart', name);
 }
 
 function openCart() {
     console.log('📖 Opening cart sidebar');
     
-    if (!cartSidebar || !overlay) {
-        console.error('❌ Cart sidebar or overlay not found');
-        return;
-    }
-    
-    cartSidebar.classList.add('active');
-    overlay.classList.add('active');
+    if (cartSidebar) cartSidebar.classList.add('active');
+    if (overlay) overlay.classList.add('active');
     isCartOpen = true;
     document.body.style.overflow = 'hidden';
-    
-    console.log('✅ Cart opened successfully');
 }
 
 function closeCart() {
     console.log('📕 Closing cart sidebar');
     
-    if (!cartSidebar || !overlay) {
-        console.error('❌ Cart sidebar or overlay not found');
-        return;
-    }
-    
-    cartSidebar.classList.remove('active');
-    overlay.classList.remove('active');
+    if (cartSidebar) cartSidebar.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
     isCartOpen = false;
     document.body.style.overflow = '';
-    
-    console.log('✅ Cart closed successfully');
 }
 
 function updateCart() {
@@ -234,9 +188,8 @@ function updateCart() {
                 <p class="empty-cart-subtitle">Add some delicious chapatis! 🥞</p>
             </div>
         `;
-        console.log('🛒 Cart is empty');
     } else {
-        cart.forEach((item, index) => {
+        cart.forEach((item) => {
             const itemTotal = item.price * item.quantity;
             total += itemTotal;
             itemCount += item.quantity;
@@ -244,15 +197,15 @@ function updateCart() {
             const cartItemElement = document.createElement('div');
             cartItemElement.classList.add('cart-item');
             cartItemElement.innerHTML = `
-                <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY2Ij5JbWFnZTwvdGV4dD4KPHN2Zz4='">
+                <img src="${item.image}" alt="${item.name}" loading="lazy">
                 <div class="cart-item-details">
                     <h4>${item.name}</h4>
                     <div class="cart-item-price">${item.price.toLocaleString()} UGX</div>
                     <div class="cart-item-quantity">
-                        <button class="quantity-btn decrease" data-id="${item.id}" title="Decrease quantity">-</button>
+                        <button class="quantity-btn decrease" data-id="${item.id}">-</button>
                         <span class="quantity">${item.quantity}</span>
-                        <button class="quantity-btn increase" data-id="${item.id}" title="Increase quantity">+</button>
-                        <button class="remove-item" data-id="${item.id}" title="Remove item">
+                        <button class="quantity-btn increase" data-id="${item.id}">+</button>
+                        <button class="remove-item" data-id="${item.id}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -261,8 +214,6 @@ function updateCart() {
             
             cartItemsContainer.appendChild(cartItemElement);
         });
-        
-        console.log(`📊 Cart updated: ${cart.length} items, ${itemCount} total quantity`);
     }
     
     // Update totals
@@ -276,7 +227,7 @@ function updateCart() {
     attachCartItemEvents();
     
     // Save to localStorage
-    saveCartToStorage();
+    localStorage.setItem('pfgChapatiCart', JSON.stringify(cart));
 }
 
 function attachCartItemEvents() {
@@ -288,9 +239,7 @@ function attachCartItemEvents() {
             
             if (item && item.quantity > 1) {
                 item.quantity -= 1;
-                console.log(`📉 Decreased ${item.name} quantity to ${item.quantity}`);
                 updateCart();
-                showMessage(`📉 Decreased ${item.name} quantity`, 'info');
             }
         });
     });
@@ -303,9 +252,7 @@ function attachCartItemEvents() {
             
             if (item) {
                 item.quantity += 1;
-                console.log(`📈 Increased ${item.name} quantity to ${item.quantity}`);
                 updateCart();
-                showMessage(`📈 Increased ${item.name} quantity`, 'info');
             }
         });
     });
@@ -314,15 +261,8 @@ function attachCartItemEvents() {
     document.querySelectorAll('.remove-item').forEach(button => {
         button.addEventListener('click', function() {
             const id = this.getAttribute('data-id');
-            const itemIndex = cart.findIndex(item => item.id === id);
-            
-            if (itemIndex > -1) {
-                const removedItem = cart[itemIndex];
-                cart.splice(itemIndex, 1);
-                console.log(`🗑️ Removed ${removedItem.name} from cart`);
-                updateCart();
-                showMessage(`🗑️ ${removedItem.name} removed from cart`, 'info');
-            }
+            cart = cart.filter(item => item.id !== id);
+            updateCart();
         });
     });
 }
@@ -347,65 +287,28 @@ function updateCartButtonsState() {
 function initializeWhatsAppOrder() {
     console.log('📱 Initializing WhatsApp Order System...');
     
-    // Floating WhatsApp button
-    const whatsappFloat = document.querySelector('.whatsapp-float');
-    if (whatsappFloat) {
-        whatsappFloat.addEventListener('click', handleWhatsAppOrder);
-        console.log('✅ Floating WhatsApp button initialized');
-    }
+    // All WhatsApp buttons
+    const whatsappButtons = document.querySelectorAll('.whatsapp-float, .whatsapp-hero-btn, .whatsapp-large-btn, #whatsappCartBtn');
     
-    // Hero WhatsApp button
-    const whatsappHeroBtn = document.querySelector('.whatsapp-hero-btn');
-    if (whatsappHeroBtn) {
-        whatsappHeroBtn.addEventListener('click', handleWhatsAppOrder);
-        console.log('✅ Hero WhatsApp button initialized');
-    }
-    
-    // Large CTA WhatsApp button
-    const whatsappLargeBtn = document.querySelector('.whatsapp-large-btn');
-    if (whatsappLargeBtn) {
-        whatsappLargeBtn.addEventListener('click', handleWhatsAppOrder);
-        console.log('✅ Large CTA WhatsApp button initialized');
-    }
-    
-    // Cart WhatsApp button
-    if (whatsappCartBtn) {
-        whatsappCartBtn.addEventListener('click', handleWhatsAppOrder);
-        console.log('✅ Cart WhatsApp button initialized');
-    }
-    
-    console.log('✅ WhatsApp Order System Initialized');
-}
-
-function handleWhatsAppOrder(e) {
-    e.preventDefault();
-    
-    console.log('📞 WhatsApp Order initiated');
-    
-    // If cart is empty and it's a cart-specific button, show error
-    if ((e.target.closest('.whatsapp-float') || e.target.closest('#whatsappCartBtn')) && cart.length === 0) {
-        showMessage('🛒 Your cart is empty! Add some items first.', 'error');
-        openCart();
-        return;
-    }
-    
-    const orderMessage = generateOrderMessage();
-    const encodedMessage = encodeURIComponent(orderMessage);
-    const whatsappUrl = `https://wa.me/256703055329?text=${encodedMessage}`;
-    
-    console.log('🔗 Opening WhatsApp URL');
-    window.open(whatsappUrl, '_blank');
-    
-    // Track the order
-    trackEvent('Order', 'WhatsApp Order', `Items: ${cart.length}`);
-    
-    // Show success message
-    showMessage('📱 Opening WhatsApp with your order!', 'success');
-    
-    // Close cart on mobile after ordering
-    if (window.innerWidth <= 768) {
-        setTimeout(closeCart, 1000);
-    }
+    whatsappButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // If it's a cart-specific button and cart is empty, show error
+            if ((this.classList.contains('whatsapp-float') || this.id === 'whatsappCartBtn') && cart.length === 0) {
+                showMessage('🛒 Your cart is empty! Add some items first.', 'error');
+                openCart();
+                return;
+            }
+            
+            const orderMessage = generateOrderMessage();
+            const encodedMessage = encodeURIComponent(orderMessage);
+            const whatsappUrl = `https://wa.me/256703055329?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+            showMessage('📱 Opening WhatsApp with your order!', 'success');
+        });
+    });
 }
 
 function generateOrderMessage() {
@@ -432,26 +335,20 @@ function generateOrderMessage() {
     message += `\n💬 *Special Instructions:* ________`;
     message += `\n\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
     
-    console.log('📝 Generated order message');
     return message;
 }
 
 // ===== CHECKOUT SYSTEM =====
 function initializeCheckoutSystem() {
-    console.log('💳 Initializing Checkout System...');
-    
     if (!checkoutBtn) {
         console.error('❌ Checkout button not found');
         return;
     }
     
     checkoutBtn.addEventListener('click', handleCheckout);
-    console.log('✅ Checkout button initialized');
 }
 
 function handleCheckout() {
-    console.log('🛒 Checkout process started');
-    
     if (cart.length === 0) {
         showMessage('🛒 Your cart is empty! Please add some items first.', 'error');
         return;
@@ -493,28 +390,17 @@ function handleCheckout() {
         closeCart();
         
         showMessage('🎉 Order placed successfully! We will call you shortly.', 'success');
-        
-        // Track the order
-        trackEvent('Order', 'Checkout', `Items: ${cart.length}, Total: ${total}`);
-        
-        console.log('✅ Checkout completed successfully');
-    }, 2000);
+    }, 1500);
 }
 
 // ===== LOCATION DETECTION =====
 function initializeLocationDetection() {
-    if (!detectLocationBtn) {
-        console.warn('⚠️ Location detection button not found');
-        return;
-    }
+    if (!detectLocationBtn) return;
     
     detectLocationBtn.addEventListener('click', detectUserLocation);
-    console.log('✅ Location detection initialized');
 }
 
 function detectUserLocation() {
-    console.log('📍 Detecting user location...');
-    
     if (!navigator.geolocation) {
         showMessage('📍 Location detection not supported by your browser', 'error');
         return;
@@ -527,18 +413,15 @@ function detectUserLocation() {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             
-            // Reverse geocoding would go here - for now, just show coordinates
-            const locationText = `📍 Detected Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+            const locationText = `📍 Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (Near Busega)`;
             
             if (deliveryAddressInput) {
                 deliveryAddressInput.value = locationText;
             }
             
             showMessage('✅ Location detected successfully!', 'success');
-            console.log('📍 Location detected:', { latitude, longitude });
         },
         function(error) {
-            console.error('❌ Location detection failed:', error);
             let errorMessage = '📍 Could not detect your location. ';
             
             switch(error.code) {
@@ -557,11 +440,6 @@ function detectUserLocation() {
             }
             
             showMessage(errorMessage, 'error');
-        },
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000
         }
     );
 }
@@ -570,20 +448,16 @@ function detectUserLocation() {
 function showLoading() {
     if (loadingSpinner) {
         loadingSpinner.classList.add('active');
-        console.log('⏳ Loading spinner shown');
     }
 }
 
 function hideLoading() {
     if (loadingSpinner) {
         loadingSpinner.classList.remove('active');
-        console.log('✅ Loading spinner hidden');
     }
 }
 
 function showMessage(message, type = 'info') {
-    console.log(`💬 ${type.toUpperCase()}: ${message}`);
-    
     // Remove existing messages
     const existingMessages = document.querySelectorAll('.message-toast');
     existingMessages.forEach(msg => msg.remove());
@@ -608,7 +482,6 @@ function showMessage(message, type = 'info') {
         ${type === 'success' ? 'background-color: #28a745;' : ''}
         ${type === 'error' ? 'background-color: #dc3545;' : ''}
         ${type === 'info' ? 'background-color: #17a2b8;' : ''}
-        ${type === 'warning' ? 'background-color: #ffc107; color: #000;' : ''}
     `;
     
     document.body.appendChild(messageDiv);
@@ -644,8 +517,6 @@ function initializeSmoothScrolling() {
                     behavior: 'smooth'
                 });
                 
-                console.log(`🎯 Scrolled to: ${targetId}`);
-                
                 // Close mobile menu if open
                 if (navLinks) {
                     navLinks.classList.remove('active');
@@ -653,8 +524,6 @@ function initializeSmoothScrolling() {
             }
         });
     });
-    
-    console.log('✅ Smooth scrolling initialized');
 }
 
 // ===== IMAGE LOADING OPTIMIZATION =====
@@ -662,10 +531,6 @@ function initializeImageLoading() {
     const images = document.querySelectorAll('img');
     
     images.forEach(img => {
-        // Set initial opacity for fade-in effect
-        img.style.opacity = '0';
-        img.style.transition = 'opacity 0.3s ease';
-        
         img.addEventListener('load', function() {
             this.style.opacity = '1';
         });
@@ -674,113 +539,39 @@ function initializeImageLoading() {
         if (img.complete) {
             img.style.opacity = '1';
         }
-        
-        // Handle image errors
-        img.addEventListener('error', function() {
-            console.warn(`⚠️ Image failed to load: ${this.src}`);
-            this.style.opacity = '1';
-        });
-    });
-    
-    console.log(`✅ Image loading optimized for ${images.length} images`);
-}
-
-// ===== LOCAL STORAGE FUNCTIONS =====
-function saveCartToStorage() {
-    try {
-        localStorage.setItem('pfgChapatiCart', JSON.stringify(cart));
-        console.log('💾 Cart saved to localStorage');
-    } catch (error) {
-        console.error('❌ Failed to save cart to localStorage:', error);
-    }
-}
-
-function loadCartFromStorage() {
-    try {
-        const savedCart = localStorage.getItem('pfgChapatiCart');
-        if (savedCart) {
-            cart = JSON.parse(savedCart);
-            updateCart();
-            console.log('📥 Cart loaded from localStorage:', cart.length, 'items');
-        }
-    } catch (error) {
-        console.error('❌ Failed to load cart from localStorage:', error);
-        cart = []; // Reset cart on error
-    }
-}
-
-// ===== ANALYTICS TRACKING =====
-function trackEvent(category, action, label) {
-    console.log(`📊 Analytics: ${category} - ${action} - ${label}`);
-    
-    // Google Analytics
-    if (typeof gtag !== 'undefined') {
-        gtag('event', action, {
-            'event_category': category,
-            'event_label': label
-        });
-    }
-    
-    // Facebook Pixel
-    if (typeof fbq !== 'undefined') {
-        fbq('track', action, {
-            content_category: category,
-            content_name: label
-        });
-    }
-}
-
-// ===== PERFORMANCE OPTIMIZATIONS =====
-// Debounce function for resize events
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-
-// Handle window resize
-window.addEventListener('resize', debounce(function() {
-    console.log('🔄 Window resized:', window.innerWidth, 'x', window.innerHeight);
-    
-    // Close cart on mobile when resizing to desktop
-    if (window.innerWidth > 768 && isCartOpen) {
-        closeCart();
-    }
-}, 250));
-
-// ===== ERROR HANDLING =====
-window.addEventListener('error', function(e) {
-    console.error('🚨 Global Error:', e.error);
-    showMessage('Something went wrong. Please refresh the page.', 'error');
-});
-
-// ===== SERVICE WORKER REGISTRATION =====
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
-            .then(function(registration) {
-                console.log('🔧 ServiceWorker registered:', registration);
-            })
-            .catch(function(error) {
-                console.log('❌ ServiceWorker registration failed:', error);
-            });
     });
 }
 
-// ===== EXPORT FOR TESTING =====
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        cart,
-        updateCart,
-        showMessage,
-        trackEvent
-    };
-}
+// Add CSS animations for messages
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
+    .empty-cart {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+    }
+    
+    .empty-cart i {
+        font-size: 50px;
+        margin-bottom: 15px;
+        color: #ddd;
+    }
+    
+    .empty-cart-subtitle {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+`;
+document.head.appendChild(style);
 
-console.log('🎉 PFG Chapati JS Successfully Loaded!');
+console.log('🎉 PFG Chapati JS Loaded Successfully!');
