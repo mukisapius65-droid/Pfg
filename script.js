@@ -748,3 +748,124 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('🎉 PFG Chapati JS Loaded Successfully!');
+// ===== MULTI-WHATSAPP NUMBER SYSTEM =====
+const whatsappNumbers = [
+    '+256703055329', // Original number
+    '+256741180856', // New number 1
+    '+256755271870', // New number 2
+    '+256789079391'  // New number 3
+];
+
+let usedNumbers = JSON.parse(localStorage.getItem('pfgChapatiUsedNumbers')) || [];
+
+function getNextWhatsAppNumber() {
+    // If all numbers have been used, reset the tracking
+    if (usedNumbers.length >= whatsappNumbers.length) {
+        usedNumbers = [];
+    }
+    
+    // Find numbers that haven't been used recently
+    const availableNumbers = whatsappNumbers.filter(num => !usedNumbers.includes(num));
+    
+    let nextNumber;
+    
+    if (availableNumbers.length > 0) {
+        // Use a number that hasn't been used recently
+        nextNumber = availableNumbers[0];
+    } else {
+        // If all numbers have been used, pick the least recently used
+        nextNumber = whatsappNumbers[0];
+        usedNumbers = usedNumbers.filter(num => num !== nextNumber);
+    }
+    
+    // Add to used numbers and save
+    usedNumbers.push(nextNumber);
+    localStorage.setItem('pfgChapatiUsedNumbers', JSON.stringify(usedNumbers));
+    
+    console.log('📱 Selected WhatsApp number:', nextNumber);
+    console.log('📊 Used numbers history:', usedNumbers);
+    
+    return nextNumber;
+}
+
+function getWhatsAppNumberStats() {
+    const stats = {
+        totalNumbers: whatsappNumbers.length,
+        recentlyUsed: usedNumbers.length,
+        available: whatsappNumbers.length - usedNumbers.length,
+        nextNumber: getNextWhatsAppNumber(false) // Peek without affecting rotation
+    };
+    return stats;
+}
+
+// ===== ENHANCED WHATSAPP ORDER SYSTEM =====
+function initializeWhatsAppOrder() {
+    console.log('📱 Initializing WhatsApp Order System...');
+    
+    // All WhatsApp buttons
+    const whatsappButtons = document.querySelectorAll('.whatsapp-float, .whatsapp-hero-btn, .whatsapp-large-btn, #whatsappCartBtn');
+    
+    whatsappButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // If it's a cart-specific button and cart is empty, show error
+            if ((this.classList.contains('whatsapp-float') || this.id === 'whatsappCartBtn') && cart.length === 0) {
+                showMessage('🛒 Your cart is empty! Add some items first.', 'error');
+                openCart();
+                return;
+            }
+            
+            const selectedNumber = getNextWhatsAppNumber();
+            const orderMessage = generateOrderMessage();
+            const encodedMessage = encodeURIComponent(orderMessage);
+            const whatsappUrl = `https://wa.me/${selectedNumber}?text=${encodedMessage}`;
+            
+            console.log(`📞 Opening WhatsApp for number: ${selectedNumber}`);
+            
+            // Show which number is being used
+            showMessage(`📱 Opening WhatsApp (${getNumberDisplay(selectedNumber)})`, 'info');
+            
+            window.open(whatsappUrl, '_blank');
+            
+            // Track the order
+            trackEvent('Order', 'WhatsApp Order', `Number: ${selectedNumber}, Items: ${cart.length}`);
+        });
+    });
+    
+    console.log('✅ WhatsApp Order System Initialized with', whatsappNumbers.length, 'numbers');
+}
+
+function getNumberDisplay(phoneNumber) {
+    // Format number for display (last 4 digits)
+    const lastFour = phoneNumber.slice(-4);
+    return `***${lastFour}`;
+}
+
+function showNumberRotationInfo() {
+    const stats = getWhatsAppNumberStats();
+    console.log('📊 WhatsApp Number Stats:', stats);
+}
+
+// ===== ADMIN DASHBOARD (Optional - for debugging) =====
+function showAdminPanel() {
+    if (confirm('Show WhatsApp number rotation info? (Admin)')) {
+        const stats = getWhatsAppNumberStats();
+        const message = 
+            `📊 WhatsApp Number Rotation\n\n` +
+            `Total Numbers: ${stats.totalNumbers}\n` +
+            `Recently Used: ${stats.recentlyUsed}\n` +
+            `Available: ${stats.available}\n\n` +
+            `Numbers:\n${whatsappNumbers.map(num => `• ${getNumberDisplay(num)} ${usedNumbers.includes(num) ? '🟡' : '🟢'}`).join('\n')}`;
+        
+        alert(message);
+    }
+}
+
+// Add admin shortcut (Ctrl+Shift+W)
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'W') {
+        e.preventDefault();
+        showAdminPanel();
+    }
+});
