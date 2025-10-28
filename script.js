@@ -575,3 +575,179 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('🎉 PFG Chapati JS Loaded Successfully!');
+// ===== CUSTOMER INFORMATION MANAGEMENT =====
+function initializeCustomerInfo() {
+    console.log('👤 Initializing Customer Information System...');
+    
+    // Load saved customer info
+    loadCustomerInfo();
+    
+    // Auto-save when user types (with debouncing)
+    const customerInputs = document.querySelectorAll('.customer-input');
+    customerInputs.forEach(input => {
+        input.addEventListener('input', debounce(saveCustomerInfo, 1000));
+    });
+    
+    console.log('✅ Customer Information System Initialized');
+}
+
+function saveCustomerInfo() {
+    const customerData = {
+        name: document.getElementById('customerName')?.value || '',
+        phone: document.getElementById('customerPhone')?.value || '',
+        email: document.getElementById('customerEmail')?.value || '',
+        address: document.getElementById('deliveryAddress')?.value || '',
+        instructions: document.getElementById('specialInstructions')?.value || ''
+    };
+    
+    try {
+        localStorage.setItem('pfgChapatiCustomerInfo', JSON.stringify(customerData));
+        console.log('💾 Customer info saved');
+    } catch (error) {
+        console.error('❌ Failed to save customer info:', error);
+    }
+}
+
+function loadCustomerInfo() {
+    try {
+        const savedData = localStorage.getItem('pfgChapatiCustomerInfo');
+        if (savedData) {
+            const customerData = JSON.parse(savedData);
+            
+            if (document.getElementById('customerName')) 
+                document.getElementById('customerName').value = customerData.name || '';
+            if (document.getElementById('customerPhone')) 
+                document.getElementById('customerPhone').value = customerData.phone || '';
+            if (document.getElementById('customerEmail')) 
+                document.getElementById('customerEmail').value = customerData.email || '';
+            if (document.getElementById('deliveryAddress')) 
+                document.getElementById('deliveryAddress').value = customerData.address || '';
+            if (document.getElementById('specialInstructions')) 
+                document.getElementById('specialInstructions').value = customerData.instructions || '';
+            
+            console.log('📥 Customer info loaded from storage');
+        }
+    } catch (error) {
+        console.error('❌ Failed to load customer info:', error);
+    }
+}
+
+function validateCustomerInfo() {
+    const name = document.getElementById('customerName')?.value.trim();
+    const phone = document.getElementById('customerPhone')?.value.trim();
+    const address = document.getElementById('deliveryAddress')?.value.trim();
+    
+    const errors = [];
+    
+    if (!name) {
+        errors.push('Full name is required');
+        document.getElementById('customerName')?.focus();
+    }
+    
+    if (!phone) {
+        errors.push('Phone number is required');
+        if (!name) document.getElementById('customerPhone')?.focus();
+    } else if (!isValidPhoneNumber(phone)) {
+        errors.push('Please enter a valid phone number');
+        document.getElementById('customerPhone')?.focus();
+    }
+    
+    if (!address) {
+        errors.push('Delivery address is required');
+        if (!name && !phone) document.getElementById('deliveryAddress')?.focus();
+    }
+    
+    return {
+        isValid: errors.length === 0,
+        errors: errors,
+        data: {
+            name: name,
+            phone: phone,
+            email: document.getElementById('customerEmail')?.value.trim() || '',
+            address: address,
+            instructions: document.getElementById('specialInstructions')?.value.trim() || ''
+        }
+    };
+}
+
+function isValidPhoneNumber(phone) {
+    // Basic phone validation for Uganda numbers
+    const phoneRegex = /^(\+256|256|0)[\d\s\-]{9,15}$/;
+    return phoneRegex.test(phone.replace(/\s/g, ''));
+}
+
+// Update the generateOrderMessage function to include customer info
+function generateOrderMessage() {
+    const validation = validateCustomerInfo();
+    const customerData = validation.data;
+    
+    let message = "🥞 *PFG CHAPATI ORDER* 🥞\n\n";
+    message += "Hello! I would like to order:\n\n";
+    
+    if (cart.length > 0) {
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            message += `${index + 1}. ${item.name} x${item.quantity} - ${itemTotal.toLocaleString()} UGX\n`;
+        });
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        message += `\n💰 *Total: ${total.toLocaleString()} UGX*`;
+    } else {
+        message += "Please help me with the menu and prices.\n";
+    }
+    
+    message += `\n\n👤 *Customer Information:*`;
+    message += `\n📛 Name: ${customerData.name}`;
+    message += `\n📞 Phone: ${customerData.phone}`;
+    if (customerData.email) {
+        message += `\n📧 Email: ${customerData.email}`;
+    }
+    message += `\n📍 Delivery: ${customerData.address}`;
+    if (customerData.instructions) {
+        message += `\n💬 Instructions: ${customerData.instructions}`;
+    }
+    
+    message += `\n\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
+    
+    return message;
+}
+
+// Update the handleCheckout function to validate customer info
+function handleCheckout() {
+    if (cart.length === 0) {
+        showMessage('🛒 Your cart is empty! Please add some items first.', 'error');
+        return;
+    }
+    
+    const validation = validateCustomerInfo();
+    if (!validation.isValid) {
+        showMessage(`❌ Please fix the following:\n${validation.errors.join('\n')}`, 'error');
+        return;
+    }
+    
+    showLoading();
+    
+    // Simulate order processing
+    setTimeout(() => {
+        hideLoading();
+        
+        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        const orderDetails = cart.map(item => 
+            `${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX`
+        ).join('\n');
+        
+        const confirmationMessage = 
+            `✅ Order Confirmed!\n\n` +
+            `Items:\n${orderDetails}\n\n` +
+            `💰 Total: ${total.toLocaleString()} UGX\n` +
+            `👤 Customer: ${validation.data.name}\n` +
+            `📞 Phone: ${validation.data.phone}\n` +
+            `📍 Delivery: ${validation.data.address}\n\n` +
+            `We will call you shortly to confirm your order!`;
+        
+        alert(confirmationMessage);
+        
+        // Clear cart but keep customer info
+        cart = [];
+        updateCart();
+        closeCart();
