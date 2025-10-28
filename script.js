@@ -716,9 +716,99 @@ document.addEventListener('DOMContentLoaded', function() {
     closeBtn.innerHTML = '<i class="fas fa-times"></i> Close Cart';
     closeBtn.onclick = closeCartSidebar;
     
-    // Add to cart sidebar
-    const cartSidebar = document.querySelector('.cart-sidebar');
-    if (cartSidebar) {
-        cartSidebar.appendChild(closeBtn);
+    // ===== ENHANCED WHATSAPP CART BUTTON =====
+function addEnhancedWhatsAppButton() {
+    // Create button container
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'cart-buttons-container';
+    
+    // Create WhatsApp button
+    const whatsappBtn = document.createElement('button');
+    whatsappBtn.className = 'cart-btn whatsapp-cart-btn';
+    whatsappBtn.innerHTML = `
+        <i class="fab fa-whatsapp"></i>
+        <span>Order via WhatsApp</span>
+    `;
+    
+    // Create Checkout button reference
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    
+    // Add WhatsApp button functionality
+    whatsappBtn.addEventListener('click', function() {
+        if (cart.length === 0) {
+            showMessage('🛒 Your cart is empty! Add some items first.', 'error');
+            return;
+        }
+        
+        const deliveryAddress = document.getElementById('deliveryAddress')?.value || 'Location not specified';
+        if (deliveryAddress === 'Location not specified') {
+            showMessage('📍 Please enter your delivery location first!', 'error');
+            document.getElementById('deliveryAddress')?.focus();
+            return;
+        }
+        
+        const orderMessage = generateOrderMessage();
+        const whatsappUrl = `https://wa.me/256703055329?text=${encodeURIComponent(orderMessage)}`;
+        
+        window.open(whatsappUrl, '_blank');
+        showMessage('📱 Opening WhatsApp with your order!', 'success');
+    });
+    
+    // Create container and add buttons
+    buttonContainer.appendChild(whatsappBtn);
+    if (checkoutBtn) {
+        checkoutBtn.parentNode.insertBefore(buttonContainer, checkoutBtn);
+        buttonContainer.appendChild(checkoutBtn);
     }
-});
+    
+    // Add CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        .cart-buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .whatsapp-cart-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .whatsapp-cart-btn:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
+        
+        .checkout-btn {
+            margin-top: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .cart-buttons-container {
+                gap: 8px;
+            }
+            
+            .whatsapp-cart-btn,
+            .checkout-btn {
+                padding: 14px;
+                font-size: 15px;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+document.addEventListener('DOMContentLoaded', addEnhancedWhatsAppButton);
