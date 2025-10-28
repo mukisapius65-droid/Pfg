@@ -6,28 +6,18 @@ let cart = JSON.parse(localStorage.getItem('pfgChapatiCart')) || [];
 let isCartOpen = false;
 
 // ===== DOM ELEMENTS =====
-const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
-const navLinks = document.querySelector('.nav-links');
-const cartIcon = document.querySelector('.cart-icon');
-const cartSidebar = document.querySelector('.cart-sidebar');
-const closeCartBtn = document.querySelector('.close-cart');
-const overlay = document.querySelector('.overlay');
-const addToCartButtons = document.querySelectorAll('.add-to-cart');
-const cartItemsContainer = document.querySelector('.cart-items');
-const cartCount = document.querySelector('.cart-count');
-const totalAmount = document.querySelector('.total-amount');
-const checkoutBtn = document.querySelector('.checkout-btn');
-const loadingSpinner = document.getElementById('loadingSpinner');
-const deliveryAddressInput = document.getElementById('deliveryAddress');
-const detectLocationBtn = document.getElementById('detectLocationBtn');
-const whatsappCartBtn = document.getElementById('whatsappCartBtn');
+let mobileMenuBtn, navLinks, cartIcon, cartSidebar, closeCartBtn, overlay;
+let addToCartButtons, cartItemsContainer, cartCount, totalAmount, checkoutBtn;
+let loadingSpinner, deliveryAddressInput, detectLocationBtn, whatsappCartBtn;
 
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 DOM Fully Loaded - Initializing Features');
     
+    initializeElements();
     initializeMobileMenu();
     initializeCartSystem();
+    initializeCustomerInfo();
     initializeWhatsAppOrder();
     initializeCheckoutSystem();
     initializeSmoothScrolling();
@@ -38,6 +28,44 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ All Features Initialized');
 });
+
+function initializeElements() {
+    console.log('🔍 Initializing DOM elements...');
+    
+    mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    navLinks = document.querySelector('.nav-links');
+    cartIcon = document.querySelector('.cart-icon');
+    cartSidebar = document.querySelector('.cart-sidebar');
+    closeCartBtn = document.querySelector('.close-cart');
+    overlay = document.querySelector('.overlay');
+    addToCartButtons = document.querySelectorAll('.add-to-cart');
+    cartItemsContainer = document.querySelector('.cart-items');
+    cartCount = document.querySelector('.cart-count');
+    totalAmount = document.querySelector('.total-amount');
+    checkoutBtn = document.querySelector('.checkout-btn');
+    loadingSpinner = document.getElementById('loadingSpinner');
+    deliveryAddressInput = document.getElementById('deliveryAddress');
+    detectLocationBtn = document.getElementById('detectLocationBtn');
+    whatsappCartBtn = document.getElementById('whatsappCartBtn');
+
+    console.log('📋 Elements initialized:', {
+        mobileMenuBtn: !!mobileMenuBtn,
+        navLinks: !!navLinks,
+        cartIcon: !!cartIcon,
+        cartSidebar: !!cartSidebar,
+        closeCartBtn: !!closeCartBtn,
+        overlay: !!overlay,
+        addToCartButtons: addToCartButtons.length,
+        cartItemsContainer: !!cartItemsContainer,
+        cartCount: !!cartCount,
+        totalAmount: !!totalAmount,
+        checkoutBtn: !!checkoutBtn,
+        loadingSpinner: !!loadingSpinner,
+        deliveryAddressInput: !!deliveryAddressInput,
+        detectLocationBtn: !!detectLocationBtn,
+        whatsappCartBtn: !!whatsappCartBtn
+    });
+}
 
 // ===== MOBILE MENU FUNCTIONALITY =====
 function initializeMobileMenu() {
@@ -78,6 +106,8 @@ function initializeCartSystem() {
     if (cartIcon) {
         cartIcon.addEventListener('click', openCart);
         console.log('✅ Cart icon event listener added');
+    } else {
+        console.error('❌ Cart icon not found');
     }
     
     // Close Cart Button
@@ -92,11 +122,23 @@ function initializeCartSystem() {
         console.log('✅ Overlay event listener added');
     }
     
-    // Add to Cart Buttons
+    // Add to Cart Buttons - FIXED: Use proper event delegation
     if (addToCartButtons.length > 0) {
         addToCartButtons.forEach((button, index) => {
+            // Remove any existing listeners first
+            button.replaceWith(button.cloneNode(true));
+        });
+        
+        // Re-select buttons after clone
+        const freshButtons = document.querySelectorAll('.add-to-cart');
+        freshButtons.forEach((button, index) => {
             button.addEventListener('click', handleAddToCart);
             console.log(`✅ Add to cart button ${index + 1} initialized`);
+            
+            // Add mobile touch styles
+            button.style.cursor = 'pointer';
+            button.style.minHeight = '44px';
+            button.style.minWidth = '44px';
         });
     } else {
         console.warn('⚠️ No add-to-cart buttons found');
@@ -124,6 +166,12 @@ function handleAddToCart(e) {
     
     console.log('📦 Product Details:', { id, name, price, image });
     
+    if (!id || !name || isNaN(price)) {
+        console.error('❌ Invalid product data');
+        showMessage('Error adding item to cart. Please try again.', 'error');
+        return;
+    }
+    
     // Check if item already exists in cart
     const existingItemIndex = cart.findIndex(item => item.id === id);
     
@@ -137,7 +185,7 @@ function handleAddToCart(e) {
             id,
             name,
             price,
-            image,
+            image: image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHZpZXdCb3g9IjAgMCA4MCA4MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjRjNGNEY2Ii8+Cjx0ZXh0IHg9IjQwIiB5PSI0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY2Ij5JbWFnZTwvdGV4dD4KPHN2Zz4=',
             quantity: 1
         });
         console.log(`🆕 Added new item: ${name}`);
@@ -146,6 +194,12 @@ function handleAddToCart(e) {
     updateCart();
     openCart();
     showMessage(`✅ ${name} added to cart!`, 'success');
+    
+    // Add visual feedback
+    button.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        button.style.transform = 'scale(1)';
+    }, 150);
 }
 
 function openCart() {
@@ -155,6 +209,8 @@ function openCart() {
     if (overlay) overlay.classList.add('active');
     isCartOpen = true;
     document.body.style.overflow = 'hidden';
+    
+    console.log('✅ Cart opened successfully');
 }
 
 function closeCart() {
@@ -164,6 +220,8 @@ function closeCart() {
     if (overlay) overlay.classList.remove('active');
     isCartOpen = false;
     document.body.style.overflow = '';
+    
+    console.log('✅ Cart closed successfully');
 }
 
 function updateCart() {
@@ -283,6 +341,63 @@ function updateCartButtonsState() {
     }
 }
 
+// ===== CUSTOMER INFORMATION MANAGEMENT =====
+function initializeCustomerInfo() {
+    console.log('👤 Initializing Customer Information System...');
+    
+    // Load saved customer info
+    loadCustomerInfo();
+    
+    // Auto-save when user types (with debouncing)
+    const customerInputs = document.querySelectorAll('.customer-input');
+    customerInputs.forEach(input => {
+        input.addEventListener('input', debounce(saveCustomerInfo, 1000));
+    });
+    
+    console.log('✅ Customer Information System Initialized');
+}
+
+function saveCustomerInfo() {
+    const customerData = {
+        name: document.getElementById('customerName')?.value || '',
+        phone: document.getElementById('customerPhone')?.value || '',
+        email: document.getElementById('customerEmail')?.value || '',
+        address: document.getElementById('deliveryAddress')?.value || '',
+        instructions: document.getElementById('specialInstructions')?.value || ''
+    };
+    
+    try {
+        localStorage.setItem('pfgChapatiCustomerInfo', JSON.stringify(customerData));
+        console.log('💾 Customer info saved');
+    } catch (error) {
+        console.error('❌ Failed to save customer info:', error);
+    }
+}
+
+function loadCustomerInfo() {
+    try {
+        const savedData = localStorage.getItem('pfgChapatiCustomerInfo');
+        if (savedData) {
+            const customerData = JSON.parse(savedData);
+            
+            if (document.getElementById('customerName')) 
+                document.getElementById('customerName').value = customerData.name || '';
+            if (document.getElementById('customerPhone')) 
+                document.getElementById('customerPhone').value = customerData.phone || '';
+            if (document.getElementById('customerEmail')) 
+                document.getElementById('customerEmail').value = customerData.email || '';
+            if (document.getElementById('deliveryAddress')) 
+                document.getElementById('deliveryAddress').value = customerData.address || '';
+            if (document.getElementById('specialInstructions')) 
+                document.getElementById('specialInstructions').value = customerData.instructions || '';
+            
+            console.log('📥 Customer info loaded from storage');
+        }
+    } catch (error) {
+        console.error('❌ Failed to load customer info:', error);
+    }
+}
+
 // ===== WHATSAPP ORDER SYSTEM =====
 function initializeWhatsAppOrder() {
     console.log('📱 Initializing WhatsApp Order System...');
@@ -312,7 +427,11 @@ function initializeWhatsAppOrder() {
 }
 
 function generateOrderMessage() {
-    const deliveryAddress = deliveryAddressInput ? deliveryAddressInput.value : '📍 Please specify delivery location';
+    const customerName = document.getElementById('customerName')?.value || 'Not provided';
+    const customerPhone = document.getElementById('customerPhone')?.value || 'Not provided';
+    const customerEmail = document.getElementById('customerEmail')?.value || '';
+    const deliveryAddress = document.getElementById('deliveryAddress')?.value || 'Not provided';
+    const specialInstructions = document.getElementById('specialInstructions')?.value || '';
     
     let message = "🥞 *PFG CHAPATI ORDER* 🥞\n\n";
     message += "Hello! I would like to order:\n\n";
@@ -329,10 +448,17 @@ function generateOrderMessage() {
         message += "Please help me with the menu and prices.\n";
     }
     
-    message += `\n\n📍 *Delivery Location:* ${deliveryAddress}`;
-    message += `\n👤 *Customer Name:* ________`;
-    message += `\n📞 *Phone Number:* ________`;
-    message += `\n💬 *Special Instructions:* ________`;
+    message += `\n\n👤 *Customer Information:*`;
+    message += `\n📛 Name: ${customerName}`;
+    message += `\n📞 Phone: ${customerPhone}`;
+    if (customerEmail) {
+        message += `\n📧 Email: ${customerEmail}`;
+    }
+    message += `\n📍 Delivery: ${deliveryAddress}`;
+    if (specialInstructions) {
+        message += `\n💬 Instructions: ${specialInstructions}`;
+    }
+    
     message += `\n\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
     
     return message;
@@ -354,13 +480,25 @@ function handleCheckout() {
         return;
     }
     
-    const deliveryAddress = deliveryAddressInput ? deliveryAddressInput.value.trim() : '';
+    const customerName = document.getElementById('customerName')?.value.trim();
+    const customerPhone = document.getElementById('customerPhone')?.value.trim();
+    const deliveryAddress = document.getElementById('deliveryAddress')?.value.trim();
+    
+    if (!customerName) {
+        showMessage('❌ Please enter your full name', 'error');
+        document.getElementById('customerName')?.focus();
+        return;
+    }
+    
+    if (!customerPhone) {
+        showMessage('❌ Please enter your phone number', 'error');
+        document.getElementById('customerPhone')?.focus();
+        return;
+    }
     
     if (!deliveryAddress) {
-        showMessage('📍 Please enter your delivery location!', 'error');
-        if (deliveryAddressInput) {
-            deliveryAddressInput.focus();
-        }
+        showMessage('❌ Please enter your delivery address', 'error');
+        document.getElementById('deliveryAddress')?.focus();
         return;
     }
     
@@ -379,12 +517,14 @@ function handleCheckout() {
             `✅ Order Confirmed!\n\n` +
             `Items:\n${orderDetails}\n\n` +
             `💰 Total: ${total.toLocaleString()} UGX\n` +
+            `👤 Customer: ${customerName}\n` +
+            `📞 Phone: ${customerPhone}\n` +
             `📍 Delivery: ${deliveryAddress}\n\n` +
             `We will call you shortly to confirm your order!`;
         
         alert(confirmationMessage);
         
-        // Clear cart and close sidebar
+        // Clear cart but keep customer info
         cart = [];
         updateCart();
         closeCart();
@@ -413,10 +553,11 @@ function detectUserLocation() {
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
             
-            const locationText = `📍 Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (Near Busega)`;
+            const locationText = `📍 Detected Location: ${latitude.toFixed(4)}, ${longitude.toFixed(4)} (Near Busega, Kampala)`;
             
-            if (deliveryAddressInput) {
-                deliveryAddressInput.value = locationText;
+            if (document.getElementById('deliveryAddress')) {
+                document.getElementById('deliveryAddress').value = locationText;
+                saveCustomerInfo();
             }
             
             showMessage('✅ Location detected successfully!', 'success');
@@ -426,13 +567,13 @@ function detectUserLocation() {
             
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    errorMessage += 'Please allow location access.';
+                    errorMessage += 'Please allow location access in your browser settings.';
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    errorMessage += 'Location information unavailable.';
+                    errorMessage += 'Location information unavailable. Please enter manually.';
                     break;
                 case error.TIMEOUT:
-                    errorMessage += 'Location request timed out.';
+                    errorMessage += 'Location request timed out. Please try again.';
                     break;
                 default:
                     errorMessage += 'An unknown error occurred.';
@@ -542,6 +683,18 @@ function initializeImageLoading() {
     });
 }
 
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 // Add CSS animations for messages
 const style = document.createElement('style');
 style.textContent = `
@@ -571,183 +724,27 @@ style.textContent = `
         font-size: 14px;
         margin-top: 5px;
     }
+    
+    /* Ensure add to cart buttons are clickable */
+    .add-to-cart {
+        cursor: pointer !important;
+        min-height: 44px !important;
+        min-width: 44px !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    /* Prevent any overlay from blocking buttons */
+    .menu-item {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .menu-item-content {
+        position: relative;
+        z-index: 2;
+    }
 `;
 document.head.appendChild(style);
 
 console.log('🎉 PFG Chapati JS Loaded Successfully!');
-// ===== CUSTOMER INFORMATION MANAGEMENT =====
-function initializeCustomerInfo() {
-    console.log('👤 Initializing Customer Information System...');
-    
-    // Load saved customer info
-    loadCustomerInfo();
-    
-    // Auto-save when user types (with debouncing)
-    const customerInputs = document.querySelectorAll('.customer-input');
-    customerInputs.forEach(input => {
-        input.addEventListener('input', debounce(saveCustomerInfo, 1000));
-    });
-    
-    console.log('✅ Customer Information System Initialized');
-}
-
-function saveCustomerInfo() {
-    const customerData = {
-        name: document.getElementById('customerName')?.value || '',
-        phone: document.getElementById('customerPhone')?.value || '',
-        email: document.getElementById('customerEmail')?.value || '',
-        address: document.getElementById('deliveryAddress')?.value || '',
-        instructions: document.getElementById('specialInstructions')?.value || ''
-    };
-    
-    try {
-        localStorage.setItem('pfgChapatiCustomerInfo', JSON.stringify(customerData));
-        console.log('💾 Customer info saved');
-    } catch (error) {
-        console.error('❌ Failed to save customer info:', error);
-    }
-}
-
-function loadCustomerInfo() {
-    try {
-        const savedData = localStorage.getItem('pfgChapatiCustomerInfo');
-        if (savedData) {
-            const customerData = JSON.parse(savedData);
-            
-            if (document.getElementById('customerName')) 
-                document.getElementById('customerName').value = customerData.name || '';
-            if (document.getElementById('customerPhone')) 
-                document.getElementById('customerPhone').value = customerData.phone || '';
-            if (document.getElementById('customerEmail')) 
-                document.getElementById('customerEmail').value = customerData.email || '';
-            if (document.getElementById('deliveryAddress')) 
-                document.getElementById('deliveryAddress').value = customerData.address || '';
-            if (document.getElementById('specialInstructions')) 
-                document.getElementById('specialInstructions').value = customerData.instructions || '';
-            
-            console.log('📥 Customer info loaded from storage');
-        }
-    } catch (error) {
-        console.error('❌ Failed to load customer info:', error);
-    }
-}
-
-function validateCustomerInfo() {
-    const name = document.getElementById('customerName')?.value.trim();
-    const phone = document.getElementById('customerPhone')?.value.trim();
-    const address = document.getElementById('deliveryAddress')?.value.trim();
-    
-    const errors = [];
-    
-    if (!name) {
-        errors.push('Full name is required');
-        document.getElementById('customerName')?.focus();
-    }
-    
-    if (!phone) {
-        errors.push('Phone number is required');
-        if (!name) document.getElementById('customerPhone')?.focus();
-    } else if (!isValidPhoneNumber(phone)) {
-        errors.push('Please enter a valid phone number');
-        document.getElementById('customerPhone')?.focus();
-    }
-    
-    if (!address) {
-        errors.push('Delivery address is required');
-        if (!name && !phone) document.getElementById('deliveryAddress')?.focus();
-    }
-    
-    return {
-        isValid: errors.length === 0,
-        errors: errors,
-        data: {
-            name: name,
-            phone: phone,
-            email: document.getElementById('customerEmail')?.value.trim() || '',
-            address: address,
-            instructions: document.getElementById('specialInstructions')?.value.trim() || ''
-        }
-    };
-}
-
-function isValidPhoneNumber(phone) {
-    // Basic phone validation for Uganda numbers
-    const phoneRegex = /^(\+256|256|0)[\d\s\-]{9,15}$/;
-    return phoneRegex.test(phone.replace(/\s/g, ''));
-}
-
-// Update the generateOrderMessage function to include customer info
-function generateOrderMessage() {
-    const validation = validateCustomerInfo();
-    const customerData = validation.data;
-    
-    let message = "🥞 *PFG CHAPATI ORDER* 🥞\n\n";
-    message += "Hello! I would like to order:\n\n";
-    
-    if (cart.length > 0) {
-        cart.forEach((item, index) => {
-            const itemTotal = item.price * item.quantity;
-            message += `${index + 1}. ${item.name} x${item.quantity} - ${itemTotal.toLocaleString()} UGX\n`;
-        });
-        
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        message += `\n💰 *Total: ${total.toLocaleString()} UGX*`;
-    } else {
-        message += "Please help me with the menu and prices.\n";
-    }
-    
-    message += `\n\n👤 *Customer Information:*`;
-    message += `\n📛 Name: ${customerData.name}`;
-    message += `\n📞 Phone: ${customerData.phone}`;
-    if (customerData.email) {
-        message += `\n📧 Email: ${customerData.email}`;
-    }
-    message += `\n📍 Delivery: ${customerData.address}`;
-    if (customerData.instructions) {
-        message += `\n💬 Instructions: ${customerData.instructions}`;
-    }
-    
-    message += `\n\n_Thank you! Looking forward to my delicious chapatis!_ 🥞`;
-    
-    return message;
-}
-
-// Update the handleCheckout function to validate customer info
-function handleCheckout() {
-    if (cart.length === 0) {
-        showMessage('🛒 Your cart is empty! Please add some items first.', 'error');
-        return;
-    }
-    
-    const validation = validateCustomerInfo();
-    if (!validation.isValid) {
-        showMessage(`❌ Please fix the following:\n${validation.errors.join('\n')}`, 'error');
-        return;
-    }
-    
-    showLoading();
-    
-    // Simulate order processing
-    setTimeout(() => {
-        hideLoading();
-        
-        const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const orderDetails = cart.map(item => 
-            `${item.name} x${item.quantity} - ${(item.price * item.quantity).toLocaleString()} UGX`
-        ).join('\n');
-        
-        const confirmationMessage = 
-            `✅ Order Confirmed!\n\n` +
-            `Items:\n${orderDetails}\n\n` +
-            `💰 Total: ${total.toLocaleString()} UGX\n` +
-            `👤 Customer: ${validation.data.name}\n` +
-            `📞 Phone: ${validation.data.phone}\n` +
-            `📍 Delivery: ${validation.data.address}\n\n` +
-            `We will call you shortly to confirm your order!`;
-        
-        alert(confirmationMessage);
-        
-        // Clear cart but keep customer info
-        cart = [];
-        updateCart();
-        closeCart();
