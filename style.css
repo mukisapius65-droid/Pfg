@@ -1629,3 +1629,23 @@ footer {
     font-weight: bold;
     text-align: center;
 }
+/* ===== BLANK CONTINUATION SPACE ===== */
+.blank-space {
+    height: 500px;
+    background: transparent;
+    width: 100%;
+    /* No content, no text, completely empty */
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .blank-space {
+        height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .blank-space {
+        height: 200px;
+    }
+}
