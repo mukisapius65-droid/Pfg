@@ -1378,3 +1378,191 @@ footer {
     font-size: 14px;
     margin-top: 5px;
 }
+/* Customer Information Styles */
+.customer-info-section,
+.location-section,
+.instructions-section {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 1px solid #e9ecef;
+}
+
+.customer-info-section h4,
+.location-section h4,
+.instructions-section h4 {
+    color: var(--primary-color);
+    margin-bottom: 12px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.customer-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+    font-size: 14px;
+}
+
+.customer-input {
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: white;
+    width: 100%;
+    font-family: inherit;
+}
+
+.customer-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(228, 0, 43, 0.1);
+}
+
+.customer-input::placeholder {
+    color: #999;
+}
+
+/* Location Section Enhancements */
+.location-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.detect-location-btn {
+    background: #17a2b8;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.detect-location-btn:hover {
+    background: #138496;
+    transform: translateY(-1px);
+}
+
+/* Instructions Section */
+.instructions-section textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* Order Options */
+.order-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Required Field Indicator */
+.form-group label::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.form-group label[for="customerEmail"]::after {
+    content: ""; /* Remove asterisk for optional field */
+}
+
+/* Save Info Toggle */
+.save-info-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.save-info-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .customer-info-section,
+    .location-section,
+    .instructions-section {
+        padding: 12px;
+        margin: 12px 0;
+    }
+    
+    .location-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .detect-location-btn {
+        align-self: flex-start;
+    }
+    
+    .customer-input {
+        padding: 14px;
+        font-size: 16px; /* Better for mobile */
+    }
+    
+    .order-options {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        padding: 15px 0;
+        margin-bottom: 0;
+        border-top: 1px solid #eee;
+    }
+}
+
+/* Form Validation Styles */
+.customer-input:invalid {
+    border-color: #dc3545;
+}
+
+.customer-input:valid {
+    border-color: #28a745;
+}
+
+.customer-input:placeholder-shown {
+    border-color: #e9ecef;
+}
+
+/* Loading State for Location Detection */
+.detect-location-btn.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.detect-location-btn.loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
