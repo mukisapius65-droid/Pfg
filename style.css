@@ -1228,13 +1228,3 @@ footer {
         text-align: center;
         margin: 0;
     }
-    
-    .back-button, 
-    .close-cart {
-        min-width: 44px;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-}
