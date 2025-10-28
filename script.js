@@ -708,3 +708,17 @@ function debugSecurityIssues() {
 }
 
 document.addEventListener('DOMContentLoaded', debugSecurityIssues);
+// ===== MINIMAL MOBILE CLOSE BUTTON =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Create and add mobile close button
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'mobile-close-btn';
+    closeBtn.innerHTML = '<i class="fas fa-times"></i> Close Cart';
+    closeBtn.onclick = closeCartSidebar;
+    
+    // Add to cart sidebar
+    const cartSidebar = document.querySelector('.cart-sidebar');
+    if (cartSidebar) {
+        cartSidebar.appendChild(closeBtn);
+    }
+});
