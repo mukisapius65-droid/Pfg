@@ -1063,3 +1063,265 @@ document.addEventListener('keydown', function(e) {
         showEnhancedAdminPanel();
     }
 });
+// ===== SERVICE WORKER REGISTRATION =====
+function initializeServiceWorker() {
+    console.log('🔧 Initializing Service Worker...');
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+            .register('/sw.js')
+            .then((registration) => {
+                console.log('✅ Service Worker registered:', registration);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    console.log('🔄 Service Worker update found!');
+                    
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('🆕 New content is available; please refresh.');
+                            showServiceWorkerUpdate();
+                        }
+                    });
+                });
+            })
+            .catch((error) => {
+                console.error('❌ Service Worker registration failed:', error);
+            });
+
+        // Listen for controlled page
+        navigator.serviceWorker.ready.then((registration) => {
+            console.log('🎯 Service Worker is ready to control the page');
+        });
+
+        // Handle messages from service worker
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            console.log('📨 Message from Service Worker:', event.data);
+            
+            if (event.data.type === 'CACHE_UPDATED') {
+                showMessage('🔄 New content available!', 'info');
+            }
+        });
+    } else {
+        console.warn('⚠️ Service Workers are not supported');
+    }
+}
+
+function showServiceWorkerUpdate() {
+    const updateDiv = document.createElement('div');
+    updateDiv.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #17a2b8;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-weight: bold;
+    `;
+    
+    updateDiv.innerHTML = `
+        <span>🆕 New version available!</span>
+        <button onclick="window.location.reload()" style="
+            background: white;
+            color: #17a2b8;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        ">Refresh</button>
+    `;
+    
+    document.body.appendChild(updateDiv);
+    
+    // Auto remove after 10 seconds
+    setTimeout(() => {
+        if (updateDiv.parentNode) {
+            updateDiv.remove();
+        }
+    }, 10000);
+}
+
+// ===== OFFLINE DETECTION =====
+function initializeOfflineDetection() {
+    console.log('📡 Initializing Offline Detection...');
+    
+    // Update UI based on connection status
+    function updateOnlineStatus() {
+        const isOnline = navigator.onLine;
+        
+        if (isOnline) {
+            document.body.classList.remove('offline');
+            document.body.classList.add('online');
+            console.log('🌐 Online');
+        } else {
+            document.body.classList.remove('online');
+            document.body.classList.add('offline');
+            console.log('📴 Offline');
+            showOfflineIndicator();
+        }
+    }
+    
+    // Create offline indicator
+    function showOfflineIndicator() {
+        // Remove existing indicator
+        const existingIndicator = document.getElementById('offlineIndicator');
+        if (existingIndicator) existingIndicator.remove();
+        
+        const indicator = document.createElement('div');
+        indicator.id = 'offlineIndicator';
+        indicator.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #dc3545;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 10000;
+            animation: slideDown 0.3s ease;
+        `;
+        indicator.innerHTML = `
+            <i class="fas fa-wifi"></i>
+            You are currently offline. Some features may be limited.
+        `;
+        
+        document.body.appendChild(indicator);
+    }
+    
+    // Listen for connection changes
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    
+    // Initial check
+    updateOnlineStatus();
+}
+
+// ===== OFFLINE CART MANAGEMENT =====
+function initializeOfflineCart() {
+    console.log('🛒 Initializing Offline Cart...');
+    
+    // Save cart to localStorage with timestamp
+    function saveCartToStorage() {
+        const cartData = {
+            items: cart,
+            timestamp: new Date().toISOString(),
+            version: '1.0'
+        };
+        
+        try {
+            localStorage.setItem('pfgChapatiCart', JSON.stringify(cartData));
+            
+            // If online, also try to sync with server
+            if (navigator.onLine) {
+                syncCartWithServer();
+            }
+        } catch (error) {
+            console.error('❌ Failed to save cart:', error);
+        }
+    }
+    
+    // Load cart from localStorage
+    function loadCartFromStorage() {
+        try {
+            const savedData = localStorage.getItem('pfgChapatiCart');
+            if (savedData) {
+                const cartData = JSON.parse(savedData);
+                cart = cartData.items || [];
+                console.log('📥 Cart loaded from storage');
+                
+                // If cart is old, you might want to handle it differently
+                const savedTime = new Date(cartData.timestamp);
+                const now = new Date();
+                const hoursDiff = (now - savedTime) / (1000 * 60 * 60);
+                
+                if (hoursDiff > 24) {
+                    console.log('🕒 Cart data is over 24 hours old');
+                    // Optionally clear old cart data
+                    // cart = [];
+                }
+            }
+        } catch (error) {
+            console.error('❌ Failed to load cart:', error);
+            cart = [];
+        }
+    }
+    
+    // Sync cart with server (when online)
+    function syncCartWithServer() {
+        if (!navigator.onLine) return;
+        
+        // Here you would typically send cart data to your backend
+        console.log('🔄 Syncing cart with server...');
+        
+        // Simulate API call
+        setTimeout(() => {
+            console.log('✅ Cart synced with server');
+        }, 1000);
+    }
+    
+    // Override the updateCart function to include offline saving
+    const originalUpdateCart = updateCart;
+    updateCart = function() {
+        originalUpdateCart();
+        saveCartToStorage();
+    };
+    
+    // Load cart on startup
+    loadCartFromStorage();
+}
+
+// ===== BACKGROUND SYNC FOR ORDERS =====
+function initializeBackgroundSync() {
+    if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        navigator.serviceWorker.ready.then((registration) => {
+            // Register for background sync
+            registration.sync.register('background-sync')
+                .then(() => {
+                    console.log('🔄 Background sync registered');
+                })
+                .catch((error) => {
+                    console.log('❌ Background sync registration failed:', error);
+                });
+        });
+    }
+}
+
+// ===== UPDATE YOUR DOMCONTENTLOADED FUNCTION =====
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM Fully Loaded - Initializing Features');
+    
+    initializeElements();
+    initializeMobileMenu();
+    initializeCartSystem();
+    initializeEnhancedCartIcon();
+    initializeCustomerInfo();
+    initializeWhatsAppOrder();
+    initializeCheckoutSystem();
+    initializeSmoothScrolling();
+    initializeImageLoading();
+    initializeLocationDetection();
+    initializeContactForm();
+    initializeCookieConsent();
+    initializeBlueIncBranding();
+    
+    // Add these new initializations
+    initializeServiceWorker();
+    initializeOfflineDetection();
+    initializeOfflineCart();
+    initializeBackgroundSync();
+    
+    updateCart();
+    
+    console.log('✅ All Features Initialized');
+});
