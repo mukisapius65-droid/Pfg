@@ -751,9 +751,9 @@ console.log('🎉 PFG Chapati JS Loaded Successfully!');
 // ===== MULTI-WHATSAPP NUMBER SYSTEM =====
 const whatsappNumbers = [
     '+256703055329', // Original number
-    '+256741180856', // New number 1
-    '+256755271870', // New number 2
-    '+256789079391'  // New number 3
+    '+256703055329', // New number 1
+    '+256703055329', // New number 2
+    '+256703055329'  // New number 3
 ];
 
 let usedNumbers = JSON.parse(localStorage.getItem('pfgChapatiUsedNumbers')) || [];
