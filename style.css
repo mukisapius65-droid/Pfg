@@ -1975,3 +1975,16 @@ body.online::before {
         color: #fff;
     }
 }
+/* Make even narrower on mobile */
+@media (max-width: 768px) {
+    a[href*="whatsapp"].float {
+        width: 56px !important;
+        height: 56px !important;
+        bottom: 20px !important;
+        right: 20px !important;
+    }
+    
+    a[href*="whatsapp"].float .icon-whatsapp {
+        font-size: 24px !important;
+    }
+}
