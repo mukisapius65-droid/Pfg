@@ -1975,16 +1975,50 @@ body.online::before {
         color: #fff;
     }
 }
-/* Make even narrower on mobile */
-@media (max-width: 768px) {
-    a[href*="whatsapp"].float {
-        width: 56px !important;
-        height: 56px !important;
-        bottom: 20px !important;
-        right: 20px !important;
-    }
-    
-    a[href*="whatsapp"].float .icon-whatsapp {
-        font-size: 24px !important;
-    }
+/* ===== MAKE WHATSAPP BUTTON NARROWER ===== */
+
+/* Target the floating WhatsApp button */
+a[href*="whatsapp"].float {
+    width: 60px !important;          /* Narrow width */
+    height: 60px !important;         /* Same height for circle */
+    border-radius: 50% !important;   /* Make it circular */
+    padding: 0 !important;           /* Remove padding */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+}
+
+/* Hide the text */
+a[href*="whatsapp"].float .icon-name {
+    display: none !important;
+}
+
+/* Hide the phone text too */
+a[href*="whatsapp"].float .phone {
+    display: none !important;
+}
+
+/* Make sure only icon shows */
+a[href*="whatsapp"].float .icon-whatsapp {
+    margin: 0 !important;
+    font-size: 28px !important;
+}
+
+/* Optional: Add pulse animation */
+@keyframes whatsapp-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+a[href*="whatsapp"].float {
+    animation: whatsapp-pulse 2s infinite;
+}
+
+/* On hover, slightly enlarge */
+a[href*="whatsapp"].float:hover {
+    width: 65px !important;
+    height: 65px !important;
+    transform: scale(1.05);
 }
