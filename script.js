@@ -1619,3 +1619,162 @@ if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
         }
     });
 }
+// ===== TEMPLATE FUNCTIONS =====
+function copyTemplate(templateType) {
+    const templates = {
+        'new-order': 'Hello PFG Chapati! I want to order fresh chapatis. Can you connect me with a maker near me?',
+        'track-order': 'What\'s the status of my order? Order ID: [Your ID]. When will it be delivered?',
+        'become-maker': 'I want to join PFG Chapati as a maker. Please send me registration details.'
+    };
+    
+    const template = templates[templateType];
+    if (!template) return;
+    
+    navigator.clipboard.writeText(template).then(() => {
+        showNotification('✅ Template copied! Paste in WhatsApp.');
+    });
+}
+
+function copyCustomTemplate() {
+    const input = document.getElementById('customTemplateInput');
+    if (!input.value.trim()) {
+        showNotification('Please type a message first');
+        input.focus();
+        return;
+    }
+    
+    navigator.clipboard.writeText(input.value).then(() => {
+        showNotification('✅ Custom template copied!');
+        
+        // Update WhatsApp link
+        const encoded = encodeURIComponent(input.value);
+        const link = document.getElementById('customWhatsAppLink');
+        link.href = `https://wa.me/256703055329?text=${encoded}`;
+    });
+}
+
+// ===== SHARE FUNCTIONS =====
+function shareWhatsApp() {
+    const message = `🍽️ Discover PFG Chapati - The best way to get fresh chapatis delivered in Kampala! Connects you with local makers for 10-minute delivery. Check it out: https://pfg-chapati.vercel.app`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+function shareFacebook() {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://pfg-chapati.vercel.app')}`, '_blank');
+}
+
+function shareLink() {
+    navigator.clipboard.writeText('https://pfg-chapati.vercel.app').then(() => {
+        showNotification('✅ Link copied to clipboard!');
+    });
+}
+
+function shareSMS() {
+    const message = 'Check out PFG Chapati - Fresh chapatis delivered in Kampala! https://pfg-chapati.vercel.app';
+    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        window.location.href = `sms:?body=${encodeURIComponent(message)}`;
+    } else {
+        shareLink();
+    }
+}
+
+// ===== REFERRAL FUNCTIONS =====
+function generateReferralCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('codeNumber').textContent = code;
+    return `PFG-${code}`;
+}
+
+function copyReferralCode() {
+    const code = document.getElementById('referralCode').textContent;
+    navigator.clipboard.writeText(code).then(() => {
+        showNotification('✅ Referral code copied! Share it with friends.');
+    });
+}
+
+function shareWithReferral() {
+    const code = document.getElementById('referralCode').textContent;
+    const message = `🍽️ Try PFG Chapati! Use my code ${code} for UGX 500 off your first order. They connect you with the best chapati makers in Kampala for 10-minute delivery: https://pfg-chapati.vercel.app?ref=${code}`;
+    
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    showNotification('✅ Sharing with your referral code!');
+}
+
+// ===== NOTIFICATION =====
+function showNotification(message) {
+    const notification = document.getElementById('templateNotification');
+    if (!notification) return;
+    
+    notification.querySelector('p').textContent = message;
+    notification.style.display = 'block';
+    
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
+
+// ===== HOVER EFFECTS =====
+document.addEventListener('DOMContentLoaded', function() {
+    // Generate referral code on load
+    generateReferralCode();
+    
+    // Add hover effects to template cards
+    document.querySelectorAll('.template-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px)';
+            this.style.boxShadow = '0 20px 40px rgba(0,0,0,0.12)';
+            this.style.borderColor = '#25D366';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 8px 30px rgba(0,0,0,0.08)';
+            this.style.borderColor = '#e9ecef';
+        });
+        
+        // Button hover
+        const btn = this.querySelector('button');
+        if (btn) {
+            btn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.03)';
+            });
+            
+            btn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+            });
+        }
+    });
+    
+    // Add hover effects to share buttons
+    document.querySelectorAll('.share-options-grid button').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.05)';
+            this.style.boxShadow = '0 15px 35px rgba(0,0,0,0.15)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Preview custom template as user types
+    const customInput = document.getElementById('customTemplateInput');
+    const preview = document.getElementById('templatePreview');
+    const previewText = document.getElementById('previewText');
+    
+    if (customInput && preview) {
+        customInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                preview.style.display = 'block';
+                previewText.textContent = this.value.substring(0, 100) + (this.value.length > 100 ? '...' : '');
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    }
+});
