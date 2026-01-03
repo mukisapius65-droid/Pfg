@@ -1605,3 +1605,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 500);
     }
 });
+// Auto-open WhatsApp on mobile after copy
+if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    // Add auto-open feature for mobile
+    const whatsappBtn = document.getElementById('whatsappLink');
+    whatsappBtn.addEventListener('click', function(e) {
+        if (currentTemplate) {
+            // Mobile will auto-open WhatsApp
+            showNotification('Opening WhatsApp...');
+        } else {
+            e.preventDefault();
+            showNotification('Please select a template first');
+        }
+    });
+}
