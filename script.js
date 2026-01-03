@@ -1325,3 +1325,283 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ All Features Initialized');
 });
+// Maker response templates
+const makerTemplates = {
+    'order-confirmed': `✅ ORDER CONFIRMED ✅
+
+Order ID: #{orderId}
+Customer: {customerName}
+Items: {orderItems}
+Total: UGX {amount}
+ETA: {eta} minutes
+Status: Preparing
+
+We'll notify you when it's out for delivery!`,
+
+    'on-the-way': `🚗 ORDER ON THE WAY!
+
+Your order #{orderId} is with our delivery rider {riderName}.
+
+Rider Phone: {riderPhone}
+ETA: {eta} minutes
+Live Tracking: {trackingLink}
+
+Please have payment ready.`,
+
+    'delay-notice': `⚠️ DELAY NOTICE
+
+Order #{orderId} is slightly delayed due to {reason}.
+
+New ETA: {newEta} minutes
+We apologize for the inconvenience.
+
+We'll keep you updated!`
+};
+// WhatsApp Template System
+const whatsappTemplates = {
+    'new-order': `Hello PFG Chapati! I want to order:
+
+🍽️ Order Details:
+- Plain Chapati: 2 pieces
+- Butter Chapati: 1 piece  
+- Egg Chapati: 1 piece
+
+📍 Delivery Address: [Your Address Here]
+📱 Phone: [Your Number]
+💰 Payment Method: Cash on Delivery
+
+Please confirm availability and total price.`,
+
+    'track-order': `Hello PFG Chapati! 
+
+I'd like to check the status of my order.
+
+📦 Order ID: [Your Order Number]
+📱 My Number: [Your Phone Number]
+
+Please let me know:
+1. Current status of my order
+2. Estimated delivery time
+3. Which maker is preparing it
+
+Thank you!`,
+
+    'urgent-order': `URGENT ORDER NEEDED!
+
+⚡ NEED CHAPATIS ASAP!
+
+I need:
+- [Number] chapatis
+- Type: [Plain/Butter/Egg]
+- For: [Number] people
+
+📍 I'm at: [Your Location]
+📱 Call me: [Your Number]
+
+Can you deliver within 10 minutes? Price is not an issue!`,
+
+    'address-change': `Hello! I need to update my delivery address.
+
+Old Address: [Previous Address]
+New Address: [New Full Address]
+
+Order ID: [If applicable]
+My Number: [Your Phone Number]
+
+Please confirm you can deliver to the new location.`,
+
+    'special-request': `Hello! I have a special request for my order:
+
+Order: [Chapati Type & Quantity]
+Special Request: 
+- Extra crispy
+- Less oil
+- More filling
+- [Your specific request]
+
+Please let me know if this is possible and any extra charges.
+
+Thank you!`,
+
+    'become-maker': `Hello PFG Chapati Team!
+
+I'm interested in joining as a chapati maker on your platform.
+
+👨🍳 About Me:
+- Location: [Your Area, Kampala]
+- Experience: [Years making chapatis]
+- Capacity: [Chapatis per hour]
+- Specialty: [Plain/Butter/Egg/Special]
+
+Please send me more details about:
+1. Registration process
+2. Commission rates  
+3. Equipment needed
+4. Training/support
+
+Looking forward to partnering with you!`
+};
+
+// Current selected template
+let currentTemplate = null;
+
+// Copy template to clipboard
+function copyTemplate(templateId) {
+    const template = whatsappTemplates[templateId];
+    if (!template) return;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(template).then(() => {
+        // Update button state
+        const button = document.querySelector(`[data-template="${templateId}"] .copy-btn`);
+        const originalText = button.textContent;
+        
+        button.textContent = '✅ Copied!';
+        button.classList.add('copied');
+        
+        // Update direct WhatsApp link
+        updateWhatsAppLink(templateId, template);
+        
+        // Reset button after 2 seconds
+        setTimeout(() => {
+            button.textContent = originalText;
+            button.classList.remove('copied');
+        }, 2000);
+        
+        // Show success message
+        showNotification('Template copied to clipboard! Paste in WhatsApp.');
+        
+    }).catch(err => {
+        console.error('Copy failed:', err);
+        showNotification('Failed to copy. Please select and copy manually.');
+    });
+}
+
+// Update WhatsApp direct link
+function updateWhatsAppLink(templateId, template) {
+    currentTemplate = templateId;
+    
+    // Encode template for URL
+    const encodedTemplate = encodeURIComponent(template);
+    const whatsappLink = document.getElementById('whatsappLink');
+    
+    // Update href
+    whatsappLink.href = `https://wa.me/256703055329?text=${encodedTemplate}`;
+    
+    // Highlight selected card
+    document.querySelectorAll('.template-card').forEach(card => {
+        card.style.background = card.dataset.template === templateId ? '#e8f5e9' : '#f8f9fa';
+        card.style.borderLeftColor = card.dataset.template === templateId ? '#25D366' : '#25D366';
+    });
+}
+
+// Show notification
+function showNotification(message) {
+    // Remove existing notification
+    const existing = document.getElementById('template-notification');
+    if (existing) existing.remove();
+    
+    // Create new notification
+    const notification = document.createElement('div');
+    notification.id = 'template-notification';
+    notification.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 10000;
+            animation: slideIn 0.3s ease;
+        ">
+            ${message}
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+// Auto-fill templates with order details
+function populateTemplateWithOrder(templateId, orderData) {
+    let template = whatsappTemplates[templateId];
+    
+    if (orderData) {
+        // Replace placeholders with actual data
+        template = template
+            .replace('[Your Address Here]', orderData.address || '')
+            .replace('[Your Number]', orderData.phone || '')
+            .replace('[Your Order Number]', orderData.orderId || '')
+            .replace('[Your Location]', orderData.location || '')
+            .replace('[Chapati Type & Quantity]', orderData.items || '');
+    }
+    
+    return template;
+}
+
+// Auto-detect order from page
+function getCurrentOrderData() {
+    try {
+        // Try to get data from cart/order form
+        const items = Array.from(document.querySelectorAll('.cart-item'))
+            .map(item => item.textContent.trim())
+            .join(', ');
+            
+        const address = document.getElementById('deliveryAddress')?.value || '';
+        const phone = document.getElementById('customerPhone')?.value || '';
+        
+        return {
+            items: items || 'Mixed Chapati Order',
+            address: address,
+            phone: phone,
+            orderId: 'PFG-' + Date.now().toString().slice(-6),
+            location: localStorage.getItem('userLocation') || ''
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+// Initialize with current order data
+document.addEventListener('DOMContentLoaded', function() {
+    const orderData = getCurrentOrderData();
+    
+    if (orderData) {
+        // Update all templates with order data
+        Object.keys(whatsappTemplates).forEach(templateId => {
+            whatsappTemplates[templateId] = populateTemplateWithOrder(templateId, orderData);
+        });
+        
+        // Auto-select "new-order" template if we have order data
+        setTimeout(() => {
+            const firstTemplate = document.querySelector('.template-card');
+            if (firstTemplate) {
+                const templateId = firstTemplate.dataset.template;
+                updateWhatsAppLink(templateId, whatsappTemplates[templateId]);
+            }
+        }, 500);
+    }
+});
