@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - PFG Chapati</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e4002b, #c20022);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .offline-container {
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .offline-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .features {
+            text-align: left;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .feature i {
+            margin-right: 10px;
+            color: #ffc72c;
+        }
+
+        .retry-btn {
+            background: #ffc72c;
+            color: #333;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .retry-btn:hover {
+            background: #ffd966;
+            transform: translateY(-2px);
+        }
+
+        .connection-status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .online {
+            background: rgba(40, 167, 69, 0.3);
+        }
+
+        .offline {
+            background: rgba(220, 53, 69, 0.3);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-10px);
+            }
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .offline-container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 28px;
+            }
+            
+            p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">
+            <i class="fas fa-wifi"></i>
+        </div>
+        
+        <h1>You're Offline</h1>
+        <p>Don't worry! You can still browse our menu and prepare your order.</p>
+        
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-check-circle"></i>
+                <span>View our complete menu</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Add items to your cart</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Check prices and totals</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-check-circle"></i>
+                <span>Your order will sync when back online</span>
+            </div>
+        </div>
+
+        <div class="connection-status offline" id="connectionStatus">
+            <i class="fas fa-exclamation-triangle"></i>
+            Currently offline - Limited functionality
+        </div>
+
+        <button class="retry-btn" onclick="retryConnection()">
+            <i class="fas fa-sync-alt"></i>
+            Retry Connection
+        </button>
+    </div>
+
+    <script>
+        function retryConnection() {
+            const statusEl = document.getElementById('connectionStatus');
+            const btn = event.target;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            btn.disabled = true;
+            
+            fetch('/', { method: 'HEAD', cache: 'no-cache' })
+                .then(() => {
+                    // We're back online
+                    statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Connection restored!';
+                    statusEl.className = 'connection-status online';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                })
+                .catch(() => {
+                    // Still offline
+                    btn.innerHTML = '<i class="fas fa-sync-alt"></i> Retry Connection';
+                    btn.disabled = false;
+                    
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Still offline - Please check your connection';
+                    statusEl.className = 'connection-status offline';
+                });
+        }
+
+        // Monitor connection status
+        window.addEventListener('online', () => {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Connection restored! Redirecting...';
+            statusEl.className = 'connection-status online';
+            
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        });
+
+        window.addEventListener('offline', () => {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Currently offline - Limited functionality';
+            statusEl.className = 'connection-status offline';
+        });
+
+        // Check initial connection status
+        if (navigator.onLine) {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
