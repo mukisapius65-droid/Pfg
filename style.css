@@ -2022,3 +2022,149 @@ a[href*="whatsapp"].float:hover {
     height: 65px !important;
     transform: scale(1.05);
 }
+/* WhatsApp Templates */
+.whatsapp-templates {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin: 40px auto;
+    max-width: 1000px;
+    box-shadow: 0 10px 40px rgba(37, 211, 102, 0.1);
+    border: 2px solid #25D366;
+}
+
+.whatsapp-templates h3 {
+    color: #25D366;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.template-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 20px;
+    border-left: 5px solid #25D366;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.template-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    background: #f0fff4;
+}
+
+.template-icon {
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+.template-card h4 {
+    margin: 10px 0;
+    color: #333;
+}
+
+.template-card p {
+    color: #666;
+    font-size: 14px;
+    margin: 10px 0 20px 0;
+    min-height: 40px;
+}
+
+.copy-btn {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    width: 100%;
+    transition: background 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: #1da851;
+}
+
+.copy-btn.copied {
+    background: #4CAF50;
+    animation: copied 0.5s ease;
+}
+
+@keyframes copied {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+
+/* Direct WhatsApp Button */
+.direct-whatsapp {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 2px dashed #e0e0e0;
+}
+
+.whatsapp-direct-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+    background: #25D366;
+    color: white;
+    padding: 18px 35px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-direct-btn:hover {
+    background: #1da851;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(37, 211, 102, 0.4);
+}
+
+.whatsapp-direct-btn span:first-child {
+    font-size: 24px;
+}
+
+.hint {
+    color: #888;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .template-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .whatsapp-templates {
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .whatsapp-direct-btn {
+        padding: 15px 25px;
+        font-size: 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    }
