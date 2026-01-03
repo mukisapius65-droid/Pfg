@@ -447,6 +447,54 @@
                         <a href="#"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
+                <!-- Add to your website (preferably in footer or fixed position) -->
+<div class="share-container">
+    <!-- Main Share Button -->
+    <button class="share-main-btn" onclick="toggleShareMenu()">
+        <span>📤</span>
+        <span>Share PFG Chapati</span>
+    </button>
+    
+    <!-- Share Options Menu (Hidden by default) -->
+    <div class="share-menu" id="shareMenu">
+        <div class="share-header">
+            <h4>Share PFG Chapati</h4>
+            <button class="close-share" onclick="toggleShareMenu()">×</button>
+        </div>
+        
+        <div class="share-options">
+            <button class="share-option" onclick="shareWhatsApp()">
+                <span class="share-icon">💚</span>
+                <span>WhatsApp</span>
+            </button>
+            
+            <button class="share-option" onclick="shareFacebook()">
+                <span class="share-icon">📘</span>
+                <span>Facebook</span>
+            </button>
+            
+            <button class="share-option" onclick="shareTwitter()">
+                <span class="share-icon">🐦</span>
+                <span>Twitter</span>
+            </button>
+            
+            <button class="share-option" onclick="shareLink()">
+                <span class="share-icon">🔗</span>
+                <span>Copy Link</span>
+            </button>
+            
+            <button class="share-option" onclick="shareSMS()">
+                <span class="share-icon">💬</span>
+                <span>SMS</span>
+            </button>
+            
+            <button class="share-option" onclick="shareMaker()">
+                <span class="share-icon">👨🍳</span>
+                <span>Share a Maker</span>
+            </button>
+        </div>
+    </div>
+</div>
                 <div class="footer-column">
                     <h3>Quick Links</h3>
                     <a href="#">Home</a>
