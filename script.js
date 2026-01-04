@@ -1325,3 +1325,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('✅ All Features Initialized');
 });
+// Simple pancake animation - ADD THIS
+document.addEventListener('DOMContentLoaded', function() {
+    // Find the pancake emoji 🥞 and make it bounce
+    const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT,
+        null,
+        false
+    );
+    
+    let node;
+    while (node = walker.nextNode()) {
+        if (node.nodeValue.includes('🥞')) {
+            // Wrap the pancake in a span with animation
+            const span = document.createElement('span');
+            span.className = 'bouncing-pancake';
+            span.innerHTML = '🥞';
+            span.style.cssText = 'display: inline-block; animation: pancakeBounce 2s infinite ease-in-out;';
+            node.parentNode.replaceChild(span, node);
+            break; // Stop after first pancake (your logo)
+        }
+    }
+});
