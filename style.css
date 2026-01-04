@@ -2185,3 +2185,12 @@ header h1:first-child,
     display: inline-block;
     animation: pancakeBounce 2s infinite ease-in-out;
     }
+/* MOBILE FIX: Hide floating buttons */
+.whatsapp-float, .call-float, 
+a[href*="whatsapp"].float,
+a[href*="wa.me"].float,
+[class*="float"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    }
