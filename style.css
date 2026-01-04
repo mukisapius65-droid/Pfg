@@ -2168,3 +2168,20 @@ a[href*="whatsapp"].float:hover {
         gap: 8px;
     }
     }
+/* PANC CAKE BOUNCE ANIMATION - ADD THIS */
+@keyframes pancakeBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+/* This will make your pancake logo bounce */
+header .logo,
+header h1:first-child,
+.header-content :first-child {
+    display: inline-block;
+    animation: pancakeBounce 2s infinite ease-in-out;
+    }
