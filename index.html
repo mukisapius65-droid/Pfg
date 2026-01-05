@@ -57,7 +57,46 @@
   fbq('track', 'PageView');
 </script>    
 </head>
-<body>
+<body><!-- Add this at the TOP of your <body> -->
+<div id="splash-screen" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #FF6B35;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    transition: opacity 0.5s ease;
+">
+    <div style="font-size: 80px; margin-bottom: 20px; animation: bounce 2s infinite;">🥞</div>
+    <h1 style="margin: 0; font-size: 2.5em;">PFG Chapati</h1>
+    <p style="opacity: 0.9; margin-top: 10px;">Loading fresh chapati connections...</p>
+    
+    <style>
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+    
+    <script>
+        // Hide splash when page loads
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('splash-screen').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('splash-screen').style.display = 'none';
+                }, 500);
+            }, 2000);
+        });
+    </script>
+    </div>
     <!-- Header -->
     <header>
         <div class="container">
