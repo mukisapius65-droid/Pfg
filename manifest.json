@@ -1,21 +1,84 @@
 {
-  "name": "PFG Chapati",
-  "short_name": "Chapati",
+  "name": "🥞 PFG Chapati",
+  "short_name": "PFG Chapati",
   "description": "10-minute chapati delivery in Kampala",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#FF6B35",
   "theme_color": "#FF6B35",
+  "lang": "en",
+  
   "icons": [
     {
-      "src": "https://emojicdn.elk.sh/%F0%9F%A5%9E?size=192",
+      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f95e/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f95e/192.png",
       "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f95e/128.png",
+      "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "https://emojicdn.elk.sh/%F0%9F%A5%9E?size=512",
-      "sizes": "512x512",
+      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f95e/96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f95e/72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f95e/64.png",
+      "sizes": "64x64",
       "type": "image/png"
     }
+  ],
+  
+  "categories": ["food", "shopping", "lifestyle"],
+  
+  "shortcuts": [
+    {
+      "name": "Order Chapati",
+      "short_name": "Order",
+      "description": "Quick order chapati",
+      "url": "/?order=quick",
+      "icons": [{
+        "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f95e/96.png",
+        "sizes": "96x96",
+        "type": "image/png"
+      }]
+    },
+    {
+      "name": "Find Makers",
+      "short_name": "Makers",
+      "description": "Find chapati makers near you",
+      "url": "/?page=makers",
+      "icons": [{
+        "src": "https://fonts.gstatic.com/s/e/notoemoji/latest/1f9d1_200d_1f373/96.png",
+        "sizes": "96x96",
+        "type": "image/png"
+      }]
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "/screenshot.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "PFG Chapati Homepage"
+    }
   ]
-}
+    }
