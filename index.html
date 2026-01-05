@@ -159,6 +159,168 @@ function showInstallPromotion() {
   setTimeout(() => installBtn.remove(), 10000);
 }
     </script>
+        <script>
+// PASTE THIS RIGHT AFTER YOUR PWA META TAGS, BEFORE </head>
+
+// Enhanced PWA installation
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    // Show custom install button
+    showCustomInstallPrompt();
+    
+    // Log for debugging
+    console.log('📱 PWA install available');
+});
+
+function showCustomInstallPrompt() {
+    // Remove any existing prompt
+    const existing = document.getElementById('pwa-install-prompt');
+    if (existing) existing.remove();
+    
+    // Create install prompt
+    const promptHTML = `
+    <div id="pwa-install-prompt" style="
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        color: #333;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        z-index: 10000;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        border: 3px solid #FF6B35;
+        animation: slideUp 0.5s ease;
+    ">
+        <div style="font-size: 48px; margin-bottom: 15px;">🥞</div>
+        <h3 style="margin: 0 0 10px 0; color: #333;">Install PFG Chapati App</h3>
+        <p style="margin: 0 0 20px 0; color: #666; font-size: 14px;">
+            Get 10-minute chapati delivery on your home screen!
+        </p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="install-btn" style="
+                background: #FF6B35;
+                color: white;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 10px;
+                font-weight: bold;
+                cursor: pointer;
+                flex: 1;
+            ">Install Now</button>
+            <button id="cancel-btn" style="
+                background: #f0f0f0;
+                color: #666;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 10px;
+                cursor: pointer;
+                flex: 1;
+            ">Later</button>
+        </div>
+        <p style="margin: 15px 0 0 0; font-size: 12px; color: #888;">
+            No Play Store needed • Less than 1MB
+        </p>
+    </div>
+    
+    <style>
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+    </style>`;
+    
+    // Add to page
+    document.body.insertAdjacentHTML('beforeend', promptHTML);
+    
+    // Add event listeners
+    document.getElementById('install-btn').addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('✅ User installed PFG Chapati PWA');
+                showSuccessMessage();
+            }
+            deferredPrompt = null;
+            document.getElementById('pwa-install-prompt').remove();
+        });
+    });
+    
+    document.getElementById('cancel-btn').addEventListener('click', () => {
+        document.getElementById('pwa-install-prompt').remove();
+        // Show again after 1 hour
+        setTimeout(showCustomInstallPrompt, 3600000);
+    });
+    
+    // Auto-remove after 30 seconds
+    setTimeout(() => {
+        const prompt = document.getElementById('pwa-install-prompt');
+        if (prompt) prompt.remove();
+    }, 30000);
+}
+
+function showSuccessMessage() {
+    const successHTML = `
+    <div style="
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        z-index: 10000;
+        animation: slideInRight 0.5s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    ">
+        <span style="font-size: 24px;">✅</span>
+        <div>
+            <strong>PFG Chapati Installed!</strong><br>
+            <small>Check your home screen</small>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+    </style>`;
+    
+    document.body.insertAdjacentHTML('beforeend', successHTML);
+    
+    setTimeout(() => {
+        const msg = document.querySelector('[style*="slideInRight"]');
+        if (msg) msg.remove();
+    }, 5000);
+}
+
+// Check if already installed
+window.addEventListener('load', () => {
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('📱 Running as installed PWA');
+        document.documentElement.setAttribute('data-pwa', 'true');
+    }
+});
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log('✅ Service Worker registered'))
+        .catch(err => console.log('❌ Service Worker failed:', err));
+}
+</script>
     </header>
 
     <!-- Hero Section -->
