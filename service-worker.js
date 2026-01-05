@@ -35,3 +35,41 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+// Add version number to force update
+const CACHE_VERSION = 'pfg-chapati-v3';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/script.js',
+  '/manifest.json',
+  '/icon.svg',
+  '/icon-192.png',
+  '/icon-512.png'
+];
+
+self.addEventListener('install', event => {
+  console.log('🔄 Installing PFG Chapati v3');
+  event.waitUntil(
+    caches.open(CACHE_VERSION).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', event => {
+  console.log('✨ Activating new PFG Chapati PWA');
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_VERSION) {
+            console.log('🗑️ Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
