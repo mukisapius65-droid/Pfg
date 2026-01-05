@@ -299,6 +299,33 @@ if (window.matchMedia('(display-mode: standalone)').matches) {
 // Show install button after 3 seconds
 setTimeout(showInstallButton, 3000);
     </script>
+        <!-- App Icons for All Platforms -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF6B35">
+
+<!-- Android/Chrome -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="🥞 PFG Chapati">
+
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="🥞 PFG Chapati">
+<link rel="apple-touch-icon" href="/icon-192.png">
+
+<!-- Windows -->
+<meta name="msapplication-TileColor" content="#FF6B35">
+<meta name="msapplication-TileImage" content="/icon-144.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="shortcut icon" href="/favicon.ico">
+
+<!-- Force Cache Clear for PWA -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
     </header>
 
     <!-- Hero Section -->
