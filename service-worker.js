@@ -22,3 +22,16 @@ self.addEventListener('fetch', event => {
     })
   );
 });
+// Add to service-worker.js
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      // If fetch fails, return offline page for HTML requests
+      if (event.request.headers.get('Accept').includes('text/html')) {
+        return caches.match('/offline.html');
+      }
+      // For other requests, try cache
+      return caches.match(event.request);
+    })
+  );
+});
