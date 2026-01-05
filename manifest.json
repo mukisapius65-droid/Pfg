@@ -1,21 +1,62 @@
 {
   "name": "PFG Chapati",
   "short_name": "PFG Chapati",
-  "description": "10-minute chapati delivery in Kampala",
-  "start_url": "/",
+  "description": "10-minute chapati delivery in Kampala - Connect with local makers",
+  "start_url": "/?source=pwa&utm_medium=pwa",
+  "scope": "/",
+  
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#FF6B35",
   "theme_color": "#FF6B35",
+  
   "icons": [
     {
-      "src": "https://emojicdn.elk.sh/%F0%9F%A5%9E?size=192",
+      "src": "/icon-192x192.png",
+      "type": "image/png",
       "sizes": "192x192",
-      "type": "image/png"
+      "purpose": "any maskable"
     },
     {
-      "src": "https://emojicdn.elk.sh/%F0%9F%A5%9E?size=512",
+      "src": "/icon-512x512.png",
+      "type": "image/png",
       "sizes": "512x512",
-      "type": "image/png"
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-144x144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "/icon-96x96.png",
+      "type": "image/png",
+      "sizes": "96x96"
     }
-  ]
+  ],
+  
+  "screenshots": [
+    {
+      "src": "https://pfg-chapati.vercel.app/screenshot.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  
+  "categories": ["food", "shopping", "lifestyle", "business"],
+  
+  "shortcuts": [
+    {
+      "name": "Order Now",
+      "short_name": "Order",
+      "description": "Quick chapati order",
+      "url": "/?quick_order=true",
+      "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  
+  "related_applications": []
 }
