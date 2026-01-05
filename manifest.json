@@ -1,19 +1,21 @@
 {
-  "name": "PFG Chapati",
-  "short_name": "PFG Chapati",
-  "description": "Fresh chapatis delivered in 10 minutes across Kampala",
+  "name": "PFG Chapati Connect",
+  "short_name": "Chapati UG",
+  "description": "Connect with chapati makers in Kampala. 10-minute delivery guaranteed.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#e4002b",
+  "background_color": "#FF6B35",
+  "theme_color": "#FF6B35",
   "orientation": "portrait",
   "scope": "/",
   "lang": "en",
+  "categories": ["food", "shopping", "lifestyle"],
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
       "sizes": "72x72",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-96x96.png",
@@ -51,19 +53,28 @@
       "type": "image/png"
     }
   ],
-  "categories": ["food", "shopping", "business"],
-  "screenshots": [
+  "shortcuts": [
     {
-      "src": "/screenshots/mobile-screenshot.png",
-      "sizes": "390x844",
-      "type": "image/png",
-      "form_factor": "narrow"
+      "name": "Order Chapati",
+      "short_name": "Order",
+      "description": "Quick order chapati",
+      "url": "/?order=quick",
+      "icons": [{ "src": "/icons/chapati-icon.png", "sizes": "96x96" }]
     },
     {
-      "src": "/screenshots/desktop-screenshot.png",
-      "sizes": "1920x1080",
+      "name": "Find Makers",
+      "short_name": "Makers",
+      "description": "Find chapati makers near you",
+      "url": "/?page=makers",
+      "icons": [{ "src": "/icons/maker-icon.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/mobile-1.png",
+      "sizes": "1080x1920",
       "type": "image/png",
-      "form_factor": "wide"
+      "form_factor": "narrow"
     }
   ]
 }
