@@ -159,146 +159,6 @@ function showInstallPromotion() {
   setTimeout(() => installBtn.remove(), 10000);
 }
     </script>
-        <!-- Add this to your <head> section -->
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#FF6B35">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="PFG Chapati">
-
-<!-- Simple PWA Installation Script -->
-<script>
-// Register Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(reg => console.log('✅ PFG Chapati PWA ready!'))
-      .catch(err => console.log('❌ PWA setup failed:', err));
-  });
-}
-
-// Show Install Button
-function showInstallButton() {
-  const btn = document.createElement('button');
-  btn.innerHTML = '📱 ADD TO HOME SCREEN';
-  btn.style.cssText = `
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: #FF6B35;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 25px;
-    font-weight: bold;
-    font-size: 14px;
-    cursor: pointer;
-    z-index: 10000;
-    box-shadow: 0 4px 15px rgba(255,107,53,0.3);
-    animation: pulse 2s infinite;
-  `;
-  
-  btn.onclick = () => {
-    if (window.deferredPrompt) {
-      window.deferredPrompt.prompt();
-      window.deferredPrompt.userChoice.then(choice => {
-        if (choice.outcome === 'accepted') {
-          btn.innerHTML = '✅ ADDED!';
-          btn.style.background = '#4CAF50';
-          setTimeout(() => btn.remove(), 2000);
-        }
-        window.deferredPrompt = null;
-      });
-    } else {
-      // Show manual instructions
-      showInstallInstructions();
-    }
-  };
-  
-  document.body.appendChild(btn);
-  
-  // Add pulse animation
-  const style = document.createElement('style');
-  style.textContent = `
-    @keyframes pulse {
-      0% { transform: scale(1); box-shadow: 0 4px 15px rgba(255,107,53,0.3); }
-      50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(255,107,53,0.5); }
-      100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255,107,53,0.3); }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-// Show installation instructions
-function showInstallInstructions() {
-  const modal = document.createElement('div');
-  modal.innerHTML = `
-    <div style="
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      z-index: 10001;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    ">
-      <div style="
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        max-width: 400px;
-        width: 100%;
-        text-align: center;
-        border: 3px solid #FF6B35;
-      ">
-        <div style="font-size: 48px; margin-bottom: 15px;">🥞</div>
-        <h3 style="margin: 0 0 10px 0;">Install PFG Chapati</h3>
-        <p style="color: #666; margin-bottom: 25px;">
-          For the best experience, add to your home screen:
-        </p>
-        
-        <div style="text-align: left; background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-          <p><strong>📱 Chrome/Android:</strong></p>
-          <ol style="margin: 10px 0 10px 20px; padding: 0;">
-            <li>Tap ⋮ (menu)</li>
-            <li>Select "Install app" or "Add to Home screen"</li>
-          </ol>
-          
-          <p><strong>🍎 Safari/iOS:</strong></p>
-          <ol style="margin: 10px 0 10px 20px; padding: 0;">
-            <li>Tap Share icon</li>
-            <li>Scroll down, tap "Add to Home Screen"</li>
-          </ol>
-        </div>
-        
-        <button onclick="this.parentElement.parentElement.remove()" style="
-          background: #FF6B35;
-          color: white;
-          border: none;
-          padding: 12px 30px;
-          border-radius: 10px;
-          font-weight: bold;
-          cursor: pointer;
-        ">
-          Got it!
-        </button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-
-// Check if PWA is already installed
-if (window.matchMedia('(display-mode: standalone)').matches) {
-  console.log('📱 Running as installed PWA');
-  document.documentElement.classList.add('pwa-installed');
-}
-
-// Show install button after 3 seconds
-setTimeout(showInstallButton, 3000);
-    </script>
     </header>
 
     <!-- Hero Section -->
@@ -552,4 +412,208 @@ setTimeout(showInstallButton, 3000);
         <a href="/" class="back-link">🔙</a>
     </div>
 </div>
-      <!-- Remove this from cart s
+      <!-- Remove this from cart sidebar -->
+<!-- DELETE: <div class="whatsapp-cart-order">...</div> -->
+
+<!-- Add these instead -->
+
+<!-- Primary WhatsApp Button (Floating) -->
+<div class="whatsapp-order-btn">
+    <a href="https://wa.me/256703055329?text=Hello%20PFG%20Chapati!%20I%20would%20like%20to%20order:" 
+       class="whatsapp-float" 
+       target="_blank">
+        <i class="fab fa-whatsapp"></i>
+        <span class="whatsapp-text">Order on WhatsApp</span>
+    </a>
+</div>
+
+<!-- WhatsApp Button in Hero Section (Desktop) -->
+<section class="hero">
+    <div class="container">
+        <h1>Fresh Chapatis Delivered in 10 Minutes</h1>
+        <p>Order delicious, hot chapatis from anywhere in Kampala and get them delivered to your doorstep in just 10 minutes!</p>
+        <div class="hero-buttons">
+            <a href="#menu" class="cta-button">Order Now</a>
+            <a href="https://wa.me/256703055329?text=Hello%20PFG%20Chapati!%20I%20would%20like%20to%20order:" 
+               class="cta-button whatsapp-hero-btn" target="_blank">
+                <i class="fab fa-whatsapp"></i>
+                Order via WhatsApp
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- WhatsApp Button after Menu Section -->
+<section class="whatsapp-cta-section">
+    <div class="container">
+        <h2>Ready to Order?</h2>
+        <p>Get your fresh chapatis delivered in 10 minutes!</p>
+        <a href="https://wa.me/256703055329?text=Hello%20PFG%20Chapati!%20I%20would%20like%20to%20order:" 
+           class="whatsapp-large-btn" target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            Order Now on WhatsApp
+        </a>
+    </div>
+</section>  
+    </section>
+
+    <!-- Business Info Section -->
+    <section class="business-info">
+        <div class="container">
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3><i class="fas fa-clock"></i> Business Hours</h3>
+                    <p>Monday - Sunday: 24/7</p>
+                    <p>Public Holidays: 8:00 AM - 9:00 PM</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-credit-card"></i> Payment Methods</h3>
+                    <p>Cash on Delivery</p>
+                    <p>Paypal</p>
+                    <p>Mobile Money</p>
+                    <p>Credit/Debit Cards</p>
+                </div>
+                <div class="info-card">
+                    <h3><i class="fas fa-map-marker-alt"></i> Delivery Areas</h3>
+                    <p>All Kampala Areas</p>
+                    <p>10-Minute Guarantee</p>
+                    <p>Free Delivery on Orders > 10,000 UGX</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="about">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>PFG Chapati</h3>
+                    <p>Your trusted partner for delicious, fresh chapatis delivered right to your doorstep in Kampala within 10 minutes.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <a href="#header">Home</a>
+                    <a href="#menu">Menu</a>
+                    <a href="#features">Why PFG</a>
+                    <a href="#copyright">Copyright</a>
+                    <a href="#about">About Us</a>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> Busega Fluex Gas Station, Opposite Stabex Gas Station</p>
+                    <p><i class="fas fa-phone"></i> +256 703 055 329</p>
+                    <p><i class="fas fa-envelope"></i> info@pfgchapati.com</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Delivery Areas</h3>
+                    <p>All areas in Kampala</p>
+                    <p>10-minute delivery guarantee</p>
+                    <p>Free delivery on orders above 10,000 UGX</p>
+                </div>
+            </div>
+            
+            <!-- Legal Links -->
+            <div class="legal-links">
+                <a href="./privacy.html">Privacy Policy</a> | 
+                <a href="./terms.html">Terms of Service</a> | 
+                <a href="./refund.html">Refund Policy</a>
+            </div><footer>
+    
+            <!-- copyright section -->
+<div class="blue-inc-credit">
+    <div class="blue-inc-logo">
+        <i class="fas fa-code"></i>
+        <span>Blue Inc</span>
+    </div>
+    <p>Digital Solutions Crafted with Excellence</p>
+    <div class="blue-inc-links">
+        <a href="https://blueinc.com" target="_blank">Website</a>
+        <a href="mailto:heyblueinc.com">Contact</a>
+        <a href="tel:+256703055329">Call</a>
+    </div>
+</div>
+            
+            <div class="copyright">
+                <p>&copy; 2026 PFG Chapati. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h2>Your Order</h2>
+            <button class="close-cart">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-items">
+            <!-- Cart items will be added here dynamically -->
+        </div>
+        <div class="cart-total">
+            <span>Total:</span>
+            <span class="total-amount">0 UGX</span>
+        </div>
+        <button class="checkout-btn">Proceed to Checkout</button>
+    </div>
+
+    <!-- Cart Icon -->
+    <div class="cart-icon">
+        <i class="fas fa-shopping-cart"></i>
+        <div class="cart-count">0</div>
+    </div>
+
+
+    
+    <!-- Floating Call Button -->
+    <div class="floating-call-btn">
+        <a href="tel:+256703055329" class="call-now">
+            <i class="fas fa-phone"></i>
+            <span>Call Now</span>
+        </a>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Stylish WhatsApp Order Button -->
+<div class="whatsapp-order-btn">
+    <a href="https://wa.me/256703055329?text=Hello%20PFG%20Chapati!%20I%20would%20like%20to%20order:" 
+       class="whatsapp-float" 
+       target="_blank">
+        <i class="fab fa-whatsapp"></i>
+        <span class="whatsapp-text">Order via WhatsApp</span>
+    </a>
+</div>
+    <!-- Blank Continuation Space -->
+<div class="blank-space" id="blank-space"></div>
+    <script>
+// Debug PWA installation
+console.log('🔍 PWA Debug Info:');
+console.log('- HTTPS:', window.location.protocol === 'https:');
+console.log('- Service Worker:', 'serviceWorker' in navigator);
+console.log('- Manifest:', document.querySelector('link[rel="manifest"]') ? 'Found' : 'Missing');
+
+fetch('/manifest.json')
+    .then(r => r.json())
+    .then(m => {
+        console.log('- Manifest content:', m);
+        console.log('- Icons:', m.icons ? `${m.icons.length} icons` : 'No icons');
+    })
+    .catch(e => console.log('- Manifest error:', e));
+    </script>
+</body>
+</html>
