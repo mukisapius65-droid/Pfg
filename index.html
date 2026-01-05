@@ -782,5 +782,77 @@ fetch('/manifest.json')
     })
     .catch(e => console.log('- Manifest error:', e));
     </script>
+    <script>
+// Check for PWA updates
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.ready.then(registration => {
+    registration.addEventListener('updatefound', () => {
+      const newWorker = registration.installing;
+      newWorker.addEventListener('statechange', () => {
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          // New update available
+          showUpdateNotification();
+        }
+      });
+    });
+  });
+}
+
+function showUpdateNotification() {
+  const updateDiv = document.createElement('div');
+  updateDiv.innerHTML = `
+    <div style="
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: #FF6B35;
+      color: white;
+      padding: 15px;
+      border-radius: 15px;
+      z-index: 10000;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      animation: slideUp 0.3s ease;
+    ">
+      <strong>🔄 Update Available</strong>
+      <p style="margin: 8px 0; font-size: 14px;">
+        New PFG Chapati app version ready
+      </p>
+      <button onclick="updatePWA()" style="
+        background: white;
+        color: #FF6B35;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-top: 5px;
+        cursor: pointer;
+      ">
+        Update Now
+      </button>
+    </div>
+    
+    <style>
+      @keyframes slideUp {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+    </style>
+  `;
+  
+  document.body.appendChild(updateDiv);
+}
+
+function updatePWA() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(registration => {
+      registration.update().then(() => {
+        location.reload();
+      });
+    });
+  }
+}
+</script>
 </body>
 </html>
