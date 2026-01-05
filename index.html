@@ -600,5 +600,20 @@ function showInstallPromotion() {
 </div>
     <!-- Blank Continuation Space -->
 <div class="blank-space" id="blank-space"></div>
+    <script>
+// Debug PWA installation
+console.log('🔍 PWA Debug Info:');
+console.log('- HTTPS:', window.location.protocol === 'https:');
+console.log('- Service Worker:', 'serviceWorker' in navigator);
+console.log('- Manifest:', document.querySelector('link[rel="manifest"]') ? 'Found' : 'Missing');
+
+fetch('/manifest.json')
+    .then(r => r.json())
+    .then(m => {
+        console.log('- Manifest content:', m);
+        console.log('- Icons:', m.icons ? `${m.icons.length} icons` : 'No icons');
+    })
+    .catch(e => console.log('- Manifest error:', e));
+    </script>
 </body>
 </html>
