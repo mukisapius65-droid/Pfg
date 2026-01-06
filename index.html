@@ -58,46 +58,6 @@
 </script>    
 </head>
 <body>
-    <!-- Add this at the TOP of your <body> -->
-<div id="splash-screen" style="
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #FF6B35;
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    text-align: center;
-    transition: opacity 0.5s ease;
-">
-    <div style="font-size: 80px; margin-bottom: 20px; animation: bounce 2s infinite;">🥞</div>
-    <h1 style="margin: 0; font-size: 2.5em;">PFG Chapati</h1>
-    <p style="opacity: 0.9; margin-top: 10px;">Loading fresh chapati connections...</p>
-    
-    <style>
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-    </style>
-    
-    <script>
-        // Hide splash when page loads
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.getElementById('splash-screen').style.opacity = '0';
-                setTimeout(function() {
-                    document.getElementById('splash-screen').style.display = 'none';
-                }, 500);
-            }, 2000);
-        });
-    </script>
-    </div>
     <!-- Header -->
     <header>
         <div class="container">
@@ -203,7 +163,8 @@ function showInstallPromotion() {
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container" >
+        <div class="container">
+            <p>🥞🥞🥞🥞🥞🥞🥞🥞🥞🥞</p>
             <h1>Fresh Chapatis Delivered in 10 Minutes</h1>
             <p>Order delicious, hot chapatis from anywhere in Kampala and get them delivered to your doorstep in just 10 minutes!</p>
             <a href="#menu" class="cta-button">Order Now</a>
@@ -311,7 +272,7 @@ function showInstallPromotion() {
                      loading="lazy">
                 <div class="menu-item-content">
                     <h3>Rolex</h3>
-                    <p>Ugandan favorite chapati wrapped around eggs, vegetables, and sometimes meat.</p>
+                    <p>Ugandan favorite - chapati wrapped around eggs, vegetables, and sometimes meat.</p>
                     <div class="price">
                         <span>1,500 UGX</span>
                         <button class="add-to-cart" data-id="4" data-name="Rolex" data-price="4500" data-image="images/rolex.jpg">Add to Cart</button>
@@ -354,7 +315,7 @@ function showInstallPromotion() {
         <!-- Cart Sidebar -->
 <div class="cart-sidebar">
     <div class="cart-header">
-        <a href="/" class="back-link">❌</a>
+        <a href="/" class="back-link">🔙</a>
         <h2>Your Order</h2>
         <button class="close-cart">
             <i class="fas fa-times"></i>
@@ -448,6 +409,7 @@ function showInstallPromotion() {
             <i class="fab fa-whatsapp"></i>
             Order via WhatsApp
         </button>
+        <a href="/" class="back-link">🔙</a>
     </div>
 </div>
       <!-- Remove this from cart sidebar -->
