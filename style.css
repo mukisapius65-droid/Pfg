@@ -124,7 +124,7 @@ nav {
 
 /* Hero Section */
  .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://pfg-chapati.vercel.app/image/pfg-hero.png');
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('./image/pfg-hero.png');
     background-size: cover;
     background-position: center;
     height: 100vh;
