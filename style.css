@@ -123,14 +123,17 @@ nav {
 }
 
 /* Hero Section */
-.hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
+ .hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
     background-size: cover;
     background-position: center;
-    color: var(--text-light);
-    padding: 100px 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
     text-align: center;
-}
+    color: white;
+    margin-top: 70px;
+ }
 
 .hero h1 {
     font-size: 48px;
