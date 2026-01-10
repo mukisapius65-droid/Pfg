@@ -1348,3 +1348,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+// Detect offline and show cached menu
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+function updateOnlineStatus() {
+    if(!navigator.onLine) {
+        document.body.innerHTML += `
+            <div style="background:red;color:white;padding:10px;text-align:center;">
+            ⚠️ OFFLINE MODE - Showing cached menu
+            </div>
+        `;
+    }
+}
+// Add this to detect offline issues
+if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(console.error);
+                }
