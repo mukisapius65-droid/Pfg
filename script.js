@@ -1348,3 +1348,888 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+// vendors.js - PFG Chapati Vendor Directory
+// ===== VENDOR DATA =====
+const vendorsData = [
+    {
+        id: 1,
+        name: "Mama Nalongo Chapati",
+        location: "Nakasero Market, Kampala",
+        area: "Nakasero",
+        latitude: 0.3163,
+        longitude: 32.5822,
+        price: 500,
+        rating: 4.7,
+        reviews: 128,
+        description: "Freshly made every morning. Special masala option available.",
+        tags: ["🔥 Hot Now", "🛵 Delivery"],
+        image: "vendor1.jpg",
+        services: ["Pickup", "Delivery"],
+        hours: "6:00 AM - 9:00 PM",
+        specialties: ["Plain Chapati", "Masala Chapati", "Rolex"],
+        contact: "+256 700 123 456"
+    },
+    {
+        id: 2,
+        name: "Kampala Chapati Hub",
+        location: "Kololo, Kampala",
+        area: "Kololo",
+        latitude: 0.3271,
+        longitude: 32.5871,
+        price: 600,
+        rating: 4.5,
+        reviews: 89,
+        description: "Family-run stall since 2015. Famous for chapati-rolex combos.",
+        tags: ["🏆 Top Rated", "🍛 With Stew"],
+        image: "vendor2.jpg",
+        services: ["Pickup", "Delivery"],
+        hours: "7:00 AM - 10:00 PM",
+        specialties: ["Chapati with Beans", "Rolex", "Kikomando"],
+        contact: "+256 700 789 012"
+    },
+    {
+        id: 3,
+        name: "Fresh Bites Chapati",
+        location: "Wandegeya, Kampala",
+        area: "Wandegeya",
+        latitude: 0.3341,
+        longitude: 32.5735,
+        price: 450,
+        rating: 4.8,
+        reviews: 210,
+        description: "Student favorite. Open late for night owls.",
+        tags: ["🕒 Open Late", "📱 Online Orders"],
+        image: "vendor3.jpg",
+        services: ["Pickup", "Delivery"],
+        hours: "24/7",
+        specialties: ["Chapati Plain", "Mandazi", "Tea/Coffee"],
+        contact: "+256 700 345 678"
+    },
+    {
+        id: 4,
+        name: "Royal Chapati Palace",
+        location: "Makerere, Kampala",
+        area: "Makerere",
+        latitude: 0.3380,
+        longitude: 32.5704,
+        price: 700,
+        rating: 4.9,
+        reviews: 156,
+        description: "Premium chapati with organic ingredients.",
+        tags: ["🌿 Organic", "👑 Premium"],
+        image: "vendor4.jpg",
+        services: ["Pickup", "Delivery"],
+        hours: "8:00 AM - 8:00 PM",
+        specialties: ["Organic Chapati", "Whole Wheat", "Special Fillings"],
+        contact: "+256 700 901 234"
+    },
+    {
+        id: 5,
+        name: "Street Chapati Express",
+        location: "Kalerwe Market, Kampala",
+        area: "Kalerwe",
+        latitude: 0.3478,
+        longitude: 32.5856,
+        price: 300,
+        rating: 4.3,
+        reviews: 95,
+        description: "Best value for money. Quick street-style chapati.",
+        tags: ["💰 Budget", "⚡ Quick"],
+        image: "vendor5.jpg",
+        services: ["Pickup Only"],
+        hours: "5:00 AM - 11:00 PM",
+        specialties: ["Street Chapati", "Simple Rolex"],
+        contact: "+256 700 567 890"
+    },
+    {
+        id: 6,
+        name: "Garden City Chapati",
+        location: "Garden City Mall, Kampala",
+        area: "Garden City",
+        latitude: 0.3187,
+        longitude: 32.5864,
+        price: 800,
+        rating: 4.6,
+        reviews: 67,
+        description: "Modern chapati spot in shopping mall.",
+        tags: ["🏬 Mall", "📦 Takeaway"],
+        image: "vendor6.jpg",
+        services: ["Pickup", "Delivery"],
+        hours: "9:00 AM - 9:00 PM",
+        specialties: ["Gourmet Chapati", "Pizza Chapati", "Dessert Chapati"],
+        contact: "+256 700 123 789"
+    }
+];
+
+// ===== DOM ELEMENTS =====
+const vendorSearchInput = document.querySelector('.vendor-search-filter .search-input');
+const vendorFilterSelect = document.querySelector('.vendor-search-filter .filter-select');
+const vendorSearchBtn = document.querySelector('.vendor-search-filter .search-btn');
+const vendorGrid = document.querySelector('.vendor-grid');
+const vendorCTA = document.querySelector('.vendor-cta');
+
+// ===== USER LOCATION (for proximity sorting) =====
+let userLocation = {
+    latitude: null,
+    longitude: null,
+    address: null
+};
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', () => {
+    initializeVendorDirectory();
+    setupVendorEventListeners();
+    requestUserLocation();
+});
+
+// ===== VENDOR DIRECTORY FUNCTIONS =====
+function initializeVendorDirectory() {
+    renderVendors(vendorsData);
+    updateVendorCount();
+}
+
+function renderVendors(vendors) {
+    if (!vendorGrid) return;
+    
+    if (vendors.length === 0) {
+        vendorGrid.innerHTML = `
+            <div class="no-vendors-found">
+                <i class="fas fa-search" style="font-size: 3rem; color: var(--gray); margin-bottom: 20px;"></i>
+                <h3>No vendors found</h3>
+                <p>Try adjusting your search criteria</p>
+            </div>
+        `;
+        return;
+    }
+    
+    vendorGrid.innerHTML = '';
+    
+    vendors.forEach(vendor => {
+        const vendorCard = document.createElement('div');
+        vendorCard.className = 'vendor-card';
+        vendorCard.setAttribute('data-vendor-id', vendor.id);
+        vendorCard.setAttribute('data-area', vendor.area.toLowerCase());
+        vendorCard.setAttribute('data-price', vendor.price);
+        vendorCard.setAttribute('data-rating', vendor.rating);
+        
+        // Calculate distance if user location is available
+        let distanceInfo = '';
+        if (userLocation.latitude && userLocation.longitude) {
+            const distance = calculateDistance(
+                userLocation.latitude,
+                userLocation.longitude,
+                vendor.latitude,
+                vendor.longitude
+            );
+            distanceInfo = `<span class="vendor-distance">📍 ${distance.toFixed(1)} km away</span>`;
+        }
+        
+        vendorCard.innerHTML = `
+            <div class="vendor-image">
+                <img src="${vendor.image}" alt="${vendor.name}" loading="lazy" 
+                     onerror="this.src='https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=80'">
+                <span class="rating-badge">⭐ ${vendor.rating}</span>
+            </div>
+            <div class="vendor-info">
+                <h3>${vendor.name}</h3>
+                <p class="vendor-location">📍 ${vendor.location}</p>
+                ${distanceInfo}
+                <p class="vendor-price">UGX ${vendor.price.toLocaleString()} ${vendor.price === 600 ? '(with beans)' : 'per chapati'}</p>
+                <p class="vendor-desc">${vendor.description}</p>
+                <div class="vendor-tags">
+                    ${vendor.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+                <div class="vendor-stats">
+                    <span class="review-count"><i class="fas fa-comment"></i> ${vendor.reviews} reviews</span>
+                    <span class="vendor-hours"><i class="fas fa-clock"></i> ${vendor.hours}</span>
+                </div>
+                <button class="view-vendor-btn" data-vendor-id="${vendor.id}">
+                    <i class="fas fa-shopping-cart"></i> View Details & Order
+                </button>
+            </div>
+        `;
+        
+        vendorGrid.appendChild(vendorCard);
+    });
+    
+    // Re-attach event listeners to new buttons
+    attachVendorButtonListeners();
+}
+
+function updateVendorCount() {
+    if (!vendorCTA) return;
+    
+    const count = vendorsData.length;
+    vendorCTA.innerHTML = `
+        <p>${count} trusted chapati makers listed. 
+        Are you a chapati maker? <a href="#vendor-signup">List your business here</a> — reach more customers!</p>
+    `;
+}
+
+// ===== SEARCH & FILTER FUNCTIONS =====
+function setupVendorEventListeners() {
+    // Search functionality
+    if (vendorSearchInput) {
+        vendorSearchInput.addEventListener('input', debounce(handleSearch, 300));
+    }
+    
+    if (vendorSearchBtn) {
+        vendorSearchBtn.addEventListener('click', handleSearch);
+    }
+    
+    // Filter functionality
+    if (vendorFilterSelect) {
+        vendorFilterSelect.addEventListener('change', handleFilter);
+    }
+    
+    // Enter key search
+    if (vendorSearchInput) {
+        vendorSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+    }
+}
+
+function handleSearch() {
+    const searchTerm = vendorSearchInput.value.toLowerCase().trim();
+    
+    if (searchTerm === '') {
+        renderVendors(vendorsData);
+        return;
+    }
+    
+    const filteredVendors = vendorsData.filter(vendor => {
+        return (
+            vendor.name.toLowerCase().includes(searchTerm) ||
+            vendor.location.toLowerCase().includes(searchTerm) ||
+            vendor.area.toLowerCase().includes(searchTerm) ||
+            vendor.description.toLowerCase().includes(searchTerm) ||
+            vendor.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+            vendor.specialties.some(specialty => specialty.toLowerCase().includes(searchTerm))
+        );
+    });
+    
+    renderVendors(filteredVendors);
+    showSearchResultsCount(filteredVendors.length, searchTerm);
+}
+
+function handleFilter() {
+    const filterValue = vendorFilterSelect.value;
+    let sortedVendors = [...vendorsData];
+    
+    switch(filterValue) {
+        case 'price_low':
+            sortedVendors.sort((a, b) => a.price - b.price);
+            break;
+        case 'price_high':
+            sortedVendors.sort((a, b) => b.price - a.price);
+            break;
+        case 'nearest':
+            if (userLocation.latitude && userLocation.longitude) {
+                sortedVendors.sort((a, b) => {
+                    const distanceA = calculateDistance(
+                        userLocation.latitude,
+                        userLocation.longitude,
+                        a.latitude,
+                        a.longitude
+                    );
+                    const distanceB = calculateDistance(
+                        userLocation.latitude,
+                        userLocation.longitude,
+                        b.latitude,
+                        b.longitude
+                    );
+                    return distanceA - distanceB;
+                });
+            } else {
+                showNotification('Enable location to sort by distance', 'info');
+                return;
+            }
+            break;
+        case 'rating_high':
+        default:
+            sortedVendors.sort((a, b) => b.rating - a.rating);
+            break;
+    }
+    
+    renderVendors(sortedVendors);
+}
+
+function showSearchResultsCount(count, searchTerm) {
+    if (count === 0) {
+        showNotification(`No vendors found for "${searchTerm}"`, 'info');
+    } else if (searchTerm !== '') {
+        showNotification(`Found ${count} vendor${count === 1 ? '' : 's'} for "${searchTerm}"`, 'success');
+    }
+}
+
+// ===== VENDOR DETAILS & ORDERING =====
+function attachVendorButtonListeners() {
+    document.querySelectorAll('.view-vendor-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const vendorId = parseInt(button.getAttribute('data-vendor-id'));
+            const vendor = vendorsData.find(v => v.id === vendorId);
+            
+            if (vendor) {
+                openVendorModal(vendor);
+            }
+        });
+    });
+    
+    // Make entire vendor card clickable
+    document.querySelectorAll('.vendor-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (!e.target.classList.contains('view-vendor-btn') && 
+                !e.target.closest('.view-vendor-btn')) {
+                const vendorId = parseInt(card.getAttribute('data-vendor-id'));
+                const vendor = vendorsData.find(v => v.id === vendorId);
+                
+                if (vendor) {
+                    openVendorModal(vendor);
+                }
+            }
+        });
+    });
+}
+
+function openVendorModal(vendor) {
+    // Create modal HTML
+    const modalHTML = `
+        <div class="vendor-modal-overlay">
+            <div class="vendor-modal">
+                <button class="close-vendor-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <div class="vendor-modal-header">
+                    <div class="vendor-modal-image">
+                        <img src="${vendor.image}" alt="${vendor.name}">
+                        <span class="modal-rating-badge">⭐ ${vendor.rating} (${vendor.reviews} reviews)</span>
+                    </div>
+                    <div class="vendor-modal-title">
+                        <h2>${vendor.name}</h2>
+                        <p class="modal-location">📍 ${vendor.location}</p>
+                        <p class="modal-price">UGX ${vendor.price.toLocaleString()} per chapati</p>
+                    </div>
+                </div>
+                
+                <div class="vendor-modal-content">
+                    <div class="modal-section">
+                        <h3><i class="fas fa-info-circle"></i> About</h3>
+                        <p>${vendor.description}</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3><i class="fas fa-tags"></i> Specialties</h3>
+                        <div class="specialties-tags">
+                            ${vendor.specialties.map(specialty => 
+                                `<span class="specialty-tag">${specialty}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3><i class="fas fa-clock"></i> Hours</h3>
+                        <p>${vendor.hours}</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3><i class="fas fa-phone"></i> Contact</h3>
+                        <p>${vendor.contact}</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3><i class="fas fa-concierge-bell"></i> Services</h3>
+                        <div class="services-list">
+                            ${vendor.services.map(service => 
+                                `<span class="service-badge ${service === 'Delivery' ? 'delivery-badge' : ''}">${service}</span>`
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="vendor-modal-footer">
+                    <button class="whatsapp-order-vendor" 
+                            onclick="window.open('https://wa.me/${vendor.contact.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(vendor.name)}!%20I%20would%20like%20to%20order%20chapati', '_blank')">
+                        <i class="fab fa-whatsapp"></i> Order via WhatsApp
+                    </button>
+                    <button class="call-vendor" 
+                            onclick="window.location.href='tel:${vendor.contact}'">
+                        <i class="fas fa-phone"></i> Call Vendor
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    document.body.style.overflow = 'hidden';
+    
+    // Add modal styling
+    addModalStyles();
+    
+    // Add event listeners
+    const closeBtn = document.querySelector('.close-vendor-modal');
+    const overlay = document.querySelector('.vendor-modal-overlay');
+    
+    closeBtn.addEventListener('click', closeVendorModal);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            closeVendorModal();
+        }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeVendorModal();
+        }
+    });
+}
+
+function closeVendorModal() {
+    const modal = document.querySelector('.vendor-modal-overlay');
+    if (modal) {
+        modal.remove();
+        document.body.style.overflow = '';
+    }
+}
+
+function addModalStyles() {
+    if (!document.querySelector('#vendor-modal-styles')) {
+        const style = document.createElement('style');
+        style.id = 'vendor-modal-styles';
+        style.textContent = `
+            .vendor-modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 3000;
+                padding: 20px;
+            }
+            
+            .vendor-modal {
+                background: white;
+                border-radius: 20px;
+                max-width: 500px;
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+                animation: modalSlideIn 0.3s ease;
+            }
+            
+            @keyframes modalSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-50px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            
+            .close-vendor-modal {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: var(--gray);
+                cursor: pointer;
+                z-index: 10;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s;
+            }
+            
+            .close-vendor-modal:hover {
+                background: var(--gray-light);
+                color: var(--danger);
+            }
+            
+            .vendor-modal-header {
+                padding: 30px 30px 20px;
+                border-bottom: 2px solid var(--gray-light);
+            }
+            
+            .vendor-modal-image {
+                position: relative;
+                width: 100%;
+                height: 200px;
+                border-radius: 15px;
+                overflow: hidden;
+                margin-bottom: 20px;
+            }
+            
+            .vendor-modal-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .modal-rating-badge {
+                position: absolute;
+                bottom: 15px;
+                right: 15px;
+                background: rgba(255,255,255,0.95);
+                padding: 8px 15px;
+                border-radius: 25px;
+                font-weight: 700;
+                color: var(--dark);
+                backdrop-filter: blur(5px);
+            }
+            
+            .vendor-modal-title h2 {
+                font-size: 1.8rem;
+                color: var(--primary);
+                margin-bottom: 10px;
+            }
+            
+            .modal-location {
+                color: var(--gray);
+                margin-bottom: 5px;
+            }
+            
+            .modal-price {
+                color: var(--secondary);
+                font-size: 1.3rem;
+                font-weight: 700;
+            }
+            
+            .vendor-modal-content {
+                padding: 20px 30px;
+            }
+            
+            .modal-section {
+                margin-bottom: 25px;
+            }
+            
+            .modal-section h3 {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: var(--dark);
+                margin-bottom: 10px;
+                font-size: 1.2rem;
+            }
+            
+            .specialties-tags, .services-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 10px;
+            }
+            
+            .specialty-tag {
+                background: var(--gray-light);
+                color: var(--gray-dark);
+                padding: 8px 15px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                font-weight: 600;
+            }
+            
+            .service-badge {
+                background: var(--primary);
+                color: white;
+                padding: 8px 15px;
+                border-radius: 20px;
+                font-size: 0.9rem;
+                font-weight: 600;
+            }
+            
+            .delivery-badge {
+                background: var(--secondary);
+            }
+            
+            .vendor-modal-footer {
+                padding: 20px 30px;
+                border-top: 2px solid var(--gray-light);
+                display: flex;
+                gap: 15px;
+            }
+            
+            .vendor-modal-footer button {
+                flex: 1;
+                padding: 15px;
+                border: none;
+                border-radius: 10px;
+                font-weight: 700;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+            }
+            
+            .whatsapp-order-vendor {
+                background: #25D366;
+                color: white;
+            }
+            
+            .whatsapp-order-vendor:hover {
+                background: #128C7E;
+            }
+            
+            .call-vendor {
+                background: var(--primary);
+                color: white;
+            }
+            
+            .call-vendor:hover {
+                background: var(--primary-dark);
+            }
+            
+            @media (max-width: 768px) {
+                .vendor-modal {
+                    max-width: 95%;
+                }
+                
+                .vendor-modal-footer {
+                    flex-direction: column;
+                }
+                
+                .vendor-modal-header {
+                    padding: 20px 20px 15px;
+                }
+                
+                .vendor-modal-content {
+                    padding: 15px 20px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+// ===== LOCATION FUNCTIONS =====
+function requestUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                userLocation.latitude = position.coords.latitude;
+                userLocation.longitude = position.coords.longitude;
+                console.log('User location detected:', userLocation);
+                
+                // Reverse geocode to get address
+                getAddressFromCoordinates(
+                    userLocation.latitude,
+                    userLocation.longitude
+                );
+            },
+            (error) => {
+                console.log('Location permission denied or error:', error);
+                // Fallback to Kampala center coordinates
+                userLocation.latitude = 0.3163;
+                userLocation.longitude = 32.5822;
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            }
+        );
+    }
+}
+
+function getAddressFromCoordinates(lat, lng) {
+    // Using Nominatim (OpenStreetMap) for reverse geocoding
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.display_name) {
+                userLocation.address = data.display_name;
+                console.log('User address:', userLocation.address);
+            }
+        })
+        .catch(error => console.log('Reverse geocoding error:', error));
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    // Haversine formula to calculate distance in kilometers
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+// ===== UTILITY FUNCTIONS =====
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function showNotification(message, type = 'info') {
+    // Remove existing notification
+    const existingNotification = document.querySelector('.vendor-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `vendor-notification ${type}`;
+    notification.innerHTML = `
+        <span>${message}</span>
+        <button class="close-notification">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Add styles
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            .vendor-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                color: var(--dark);
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                z-index: 2000;
+                animation: slideIn 0.3s ease;
+                max-width: 400px;
+                border-left: 5px solid var(--primary);
+            }
+            
+            .vendor-notification.success {
+                border-left-color: var(--success);
+            }
+            
+            .vendor-notification.info {
+                border-left-color: var(--primary);
+            }
+            
+            .vendor-notification.warning {
+                border-left-color: var(--warning);
+            }
+            
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            
+            .close-notification {
+                background: none;
+                border: none;
+                color: var(--gray);
+                cursor: pointer;
+                padding: 5px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s;
+            }
+            
+            .close-notification:hover {
+                background: var(--gray-light);
+                color: var(--dark);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Close button functionality
+    notification.querySelector('.close-notification').addEventListener('click', () => {
+        notification.remove();
+    });
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// ===== VENDOR STATS & ANALYTICS =====
+function trackVendorInteraction(vendorId, action) {
+    // This would typically send data to your analytics platform
+    console.log(`Vendor ${vendorId} - ${action}`);
+    
+    // Store in localStorage for basic analytics
+    const interactions = JSON.parse(localStorage.getItem('vendorInteractions')) || [];
+    interactions.push({
+        vendorId,
+        action,
+        timestamp: new Date().toISOString()
+    });
+    localStorage.setItem('vendorInteractions', JSON.stringify(interactions));
+}
+
+// ===== INITIALIZE ON PAGE LOAD =====
+// Check if we're on the vendors page
+if (window.location.hash === '#vendors' || document.querySelector('.vendor-directory')) {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Small delay to ensure all elements are loaded
+        setTimeout(() => {
+            // Highlight active filter if present in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter');
+            if (filter && vendorFilterSelect) {
+                vendorFilterSelect.value = filter;
+                handleFilter();
+            }
+            
+            const search = urlParams.get('search');
+            if (search && vendorSearchInput) {
+                vendorSearchInput.value = search;
+                handleSearch();
+            }
+        }, 100);
+    });
+}
+
+// ===== EXPORT FUNCTIONS FOR GLOBAL USE =====
+window.VendorDirectory = {
+    searchVendors: handleSearch,
+    filterVendors: handleFilter,
+    openVendorModal: openVendorModal,
+    getUserLocation: () => userLocation
+};
