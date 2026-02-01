@@ -2233,3 +2233,552 @@ window.VendorDirectory = {
     openVendorModal: openVendorModal,
     getUserLocation: () => userLocation
 };
+// js/auth-system.js
+import { 
+    getAuth, 
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider,
+    signInWithPhoneNumber,
+    RecaptchaVerifier,
+    sendPasswordResetEmail,
+    sendEmailVerification,
+    updateProfile,
+    signOut,
+    onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { 
+    doc, 
+    setDoc, 
+    getDoc, 
+    updateDoc,
+    serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+import { db } from './firebase-init.js';
+
+class AuthenticationSystem {
+    constructor() {
+        this.auth = getAuth();
+        this.googleProvider = new GoogleAuthProvider();
+        this.recaptchaVerifier = null;
+        this.confirmationResult = null;
+        this.otpTimer = null;
+        this.otpTimeLeft = 120;
+        
+        this.init();
+    }
+    
+    init() {
+        this.setupEventListeners();
+        this.checkAuthState();
+        this.setupRecaptcha();
+    }
+    
+    setupEventListeners() {
+        // Auth modal toggle
+        document.getElementById('loginBtn').addEventListener('click', () => this.showAuthModal('login'));
+        document.querySelector('.close-auth-modal').addEventListener('click', () => this.hideAuthModal());
+        document.querySelector('.auth-modal-overlay').addEventListener('click', (e) => {
+            if (e.target.classList.contains('auth-modal-overlay')) {
+                this.hideAuthModal();
+            }
+        });
+        
+        // Tab switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const tabName = e.target.dataset.tab;
+                this.switchAuthTab(tabName);
+            });
+        });
+        
+        // Form switching links
+        document.querySelectorAll('[data-tab]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabName = e.target.closest('[data-tab]').dataset.tab;
+                this.switchAuthTab(tabName);
+            });
+        });
+        
+        // Form submissions
+        document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
+        document.getElementById('signupForm').addEventListener('submit', (e) => this.handleSignup(e));
+        document.getElementById('resetForm').addEventListener('submit', (e) => this.handlePasswordReset(e));
+        
+        // Phone authentication
+        document.getElementById('phoneLoginTab').addEventListener('click', () => this.switchAuthTab('phone'));
+        document.getElementById('sendOTP').addEventListener('click', () => this.sendPhoneOTP());
+        document.getElementById('verifyOTP').addEventListener('click', () => this.verifyPhoneOTP());
+        document.getElementById('resendOTP').addEventListener('click', () => this.resendOTP());
+        
+        // Google login
+        document.getElementById('googleLogin').addEventListener('click', () => this.signInWithGoogle());
+        
+        // Password visibility toggle
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetId = e.target.closest('.toggle-password').dataset.target;
+                const input = document.getElementById(targetId);
+                const icon = e.target.closest('.toggle-password').querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+        
+        // User profile
+        document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
+        document.getElementById('authHeaderBtn').addEventListener('click', (e) => {
+            if (this.auth.currentUser) {
+                this.toggleUserProfile();
+            }
+        });
+        
+        // Email verification
+        document.getElementById('resendVerification').addEventListener('click', () => this.resendVerificationEmail());
+        document.getElementById('closeVerification').addEventListener('click', () => this.hideVerificationModal());
+        document.getElementById('changeEmailBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.hideVerificationModal();
+            this.showAuthModal('signup');
+        });
+    }
+    
+    checkAuthState() {
+        onAuthStateChanged(this.auth, async (user) => {
+            if (user) {
+                // User is signed in
+                await this.handleUserSignedIn(user);
+            } else {
+                // User is signed out
+                this.handleUserSignedOut();
+            }
+        });
+    }
+    
+    async handleUserSignedIn(user) {
+        console.log('User signed in:', user.email);
+        
+        // Update UI
+        this.updateUserProfile(user);
+        
+        // Check if email is verified
+        if (!user.emailVerified) {
+            this.showVerificationModal(user.email);
+        }
+        
+        // Create/update user document in Firestore
+        await this.syncUserToFirestore(user);
+        
+        // Update login streak
+        await this.updateLoginStreak(user.uid);
+    }
+    
+    handleUserSignedOut() {
+        console.log('User signed out');
+        
+        // Update UI to show login button
+        const loginBtn = document.getElementById('loginBtn');
+        loginBtn.innerHTML = '<i class="fas fa-user"></i><span>Login</span>';
+        loginBtn.onclick = () => this.showAuthModal('login');
+        
+        // Hide profile menu
+        document.querySelector('.user-profile-menu').classList.remove('active');
+    }
+    
+    async handleLogin(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
+        
+        const submitBtn = e.target.querySelector('.auth-submit-btn');
+        const originalText = submitBtn.innerHTML;
+        
+        try {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+            submitBtn.disabled = true;
+            
+            // Set persistence based on "Remember me"
+            await this.auth.setPersistence(
+                rememberMe ? 'LOCAL' : 'SESSION'
+            );
+            
+            const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+            const user = userCredential.user;
+            
+            // Show success message
+            this.showNotification('Login successful!', 'success');
+            
+            // Hide auth modal
+            this.hideAuthModal();
+            
+            // Clear form
+            e.target.reset();
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            
+            let errorMessage = 'Login failed. Please try again.';
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    errorMessage = 'No account found with this email.';
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage = 'Incorrect password.';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = 'Invalid email format.';
+                    break;
+                case 'auth/too-many-requests':
+                    errorMessage = 'Too many failed attempts. Try again later.';
+                    break;
+            }
+            
+            this.showNotification(errorMessage, 'error');
+            
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+    
+    async handleSignup(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const phone = document.getElementById('signupPhone').value;
+        const password = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        
+        // Validate
+        if (password !== confirmPassword) {
+            this.showNotification('Passwords do not match!', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            this.showNotification('Password must be at least 6 characters', 'error');
+            return;
+        }
+        
+        const submitBtn = e.target.querySelector('.auth-submit-btn');
+        const originalText = submitBtn.innerHTML;
+        
+        try {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating account...';
+            submitBtn.disabled = true;
+            
+            // Create user with email/password
+            const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+            const user = userCredential.user;
+            
+            // Update profile with display name
+            await updateProfile(user, { displayName: name });
+            
+            // Send email verification
+            await sendEmailVerification(user);
+            
+            // Create user document in Firestore
+            await this.createUserDocument(user, { name, phone });
+            
+            // Show verification modal
+            this.showVerificationModal(email);
+            
+            // Clear form
+            e.target.reset();
+            
+            // Switch to login tab
+            this.switchAuthTab('login');
+            
+            this.showNotification('Account created! Please verify your email.', 'success');
+            
+        } catch (error) {
+            console.error('Signup error:', error);
+            
+            let errorMessage = 'Signup failed. Please try again.';
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    errorMessage = 'Email already registered. Try logging in.';
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = 'Invalid email format.';
+                    break;
+                case 'auth/weak-password':
+                    errorMessage = 'Password is too weak.';
+                    break;
+            }
+            
+            this.showNotification(errorMessage, 'error');
+            
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+    
+    async handlePasswordReset(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('resetEmail').value;
+        const submitBtn = e.target.querySelector('.auth-submit-btn');
+        const originalText = submitBtn.innerHTML;
+        
+        try {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+            
+            await sendPasswordResetEmail(this.auth, email);
+            
+            this.showNotification('Password reset email sent! Check your inbox.', 'success');
+            e.target.reset();
+            this.switchAuthTab('login');
+            
+        } catch (error) {
+            console.error('Password reset error:', error);
+            this.showNotification('Failed to send reset email. Check email address.', 'error');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+    
+    async signInWithGoogle() {
+        try {
+            const result = await signInWithPopup(this.auth, this.googleProvider);
+            const user = result.user;
+            
+            // Check if user document exists, create if not
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!userDoc.exists()) {
+                await this.createUserDocument(user, {
+                    name: user.displayName,
+                    email: user.email,
+                    provider: 'google'
+                });
+            }
+            
+            this.showNotification('Google login successful!', 'success');
+            this.hideAuthModal();
+            
+        } catch (error) {
+            console.error('Google sign-in error:', error);
+            this.showNotification('Google login failed. Please try again.', 'error');
+        }
+    }
+    
+    setupRecaptcha() {
+        // Only setup on pages with phone login
+        if (document.getElementById('phoneForm')) {
+            this.recaptchaVerifier = new RecaptchaVerifier(this.auth, 'sendOTP', {
+                'size': 'invisible',
+                'callback': (response) => {
+                    console.log('reCAPTCHA solved');
+                }
+            });
+        }
+    }
+    
+    async sendPhoneOTP() {
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        
+        if (!phoneNumber) {
+            this.showNotification('Please enter a phone number', 'error');
+            return;
+        }
+        
+        const sendBtn = document.getElementById('sendOTP');
+        const originalText = sendBtn.innerHTML;
+        
+        try {
+            sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            sendBtn.disabled = true;
+            
+            // Send OTP
+            this.confirmationResult = await signInWithPhoneNumber(
+                this.auth, 
+                phoneNumber, 
+                this.recaptchaVerifier
+            );
+            
+            // Show OTP input section
+            document.getElementById('otpSection').style.display = 'block';
+            
+            // Start OTP timer
+            this.startOTPTimer();
+            
+            this.showNotification('OTP sent to your phone!', 'success');
+            
+        } catch (error) {
+            console.error('OTP send error:', error);
+            
+            let errorMessage = 'Failed to send OTP. Please try again.';
+            if (error.code === 'auth/invalid-phone-number') {
+                errorMessage = 'Invalid phone number format. Use +256XXXXXXXXX';
+            }
+            
+            this.showNotification(errorMessage, 'error');
+            
+        } finally {
+            sendBtn.innerHTML = originalText;
+            sendBtn.disabled = false;
+        }
+    }
+    
+    async verifyPhoneOTP() {
+        const otpCode = document.getElementById('otpCode').value;
+        
+        if (!otpCode || otpCode.length !== 6) {
+            this.showNotification('Please enter a valid 6-digit OTP', 'error');
+            return;
+        }
+        
+        const verifyBtn = document.getElementById('verifyOTP');
+        const originalText = verifyBtn.innerHTML;
+        
+        try {
+            verifyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            verifyBtn.disabled = true;
+            
+            const result = await this.confirmationResult.confirm(otpCode);
+            const user = result.user;
+            
+            // Create user document if new user
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!userDoc.exists()) {
+                await this.createUserDocument(user, {
+                    phoneNumber: user.phoneNumber,
+                    provider: 'phone'
+                });
+            }
+            
+            this.showNotification('Phone verification successful!', 'success');
+            this.hideAuthModal();
+            this.resetOTPSection();
+            
+        } catch (error) {
+            console.error('OTP verification error:', error);
+            this.showNotification('Invalid OTP code. Please try again.', 'error');
+        } finally {
+            verifyBtn.innerHTML = originalText;
+            verifyBtn.disabled = false;
+        }
+    }
+    
+    startOTPTimer() {
+        this.otpTimeLeft = 120;
+        const timerElement = document.getElementById('otpTimer');
+        const resendBtn = document.getElementById('resendOTP');
+        
+        resendBtn.disabled = true;
+        
+        this.otpTimer = setInterval(() => {
+            this.otpTimeLeft--;
+            
+            const minutes = Math.floor(this.otpTimeLeft / 60);
+            const seconds = this.otpTimeLeft % 60;
+            
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (this.otpTimeLeft <= 0) {
+                clearInterval(this.otpTimer);
+                timerElement.textContent = '00:00';
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Resend Code';
+            }
+        }, 1000);
+    }
+    
+    async resendOTP() {
+        if (this.otpTimeLeft > 0) return;
+        
+        clearInterval(this.otpTimer);
+        await this.sendPhoneOTP();
+    }
+    
+    resetOTPSection() {
+        clearInterval(this.otpTimer);
+        document.getElementById('otpSection').style.display = 'none';
+        document.getElementById('otpCode').value = '';
+        document.getElementById('phoneNumber').value = '';
+        document.getElementById('otpTimer').textContent = '02:00';
+        document.getElementById('resendOTP').disabled = true;
+    }
+    
+    async createUserDocument(user, additionalData = {}) {
+        try {
+            const userRef = doc(db, 'users', user.uid);
+            
+            const userData = {
+                uid: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || additionalData.name || '',
+                phoneNumber: user.phoneNumber || additionalData.phone || '',
+                emailVerified: user.emailVerified || false,
+                provider: additionalData.provider || 'email',
+                photoURL: user.photoURL || '',
+                beans: 50, // Welcome bonus beans
+                streak: 0,
+                totalOrders: 0,
+                totalSpent: 0,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                preferences: {
+                    notifications: true,
+                    emailUpdates: true,
+                    theme: 'light'
+                }
+            };
+            
+            await setDoc(userRef, userData);
+            console.log('User document created:', user.uid);
+            
+        } catch (error) {
+            console.error('Error creating user document:', error);
+        }
+    }
+    
+    async syncUserToFirestore(user) {
+        try {
+            const userRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userRef);
+            
+            if (!userDoc.exists()) {
+                await this.createUserDocument(user);
+            } else {
+                // Update last login
+                await updateDoc(userRef, {
+                    lastLogin: serverTimestamp()
+                });
+            }
+            
+        } catch (error) {
+            console.error('Error syncing user to Firestore:', error);
+        }
+    }
+    
+    async updateLoginStreak(userId) {
+        try {
+            const userRef = doc(db, 'users', userId);
+            const userDoc = await getDoc(userRef);
+            
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                const today = new Date().toDateString();
+                const lastLogin = userData.lastLoginDate || '';
+                
+                let newStreak = userData.streak || 0;
+                
+                if (lastLogin !== today) {
+    
