@@ -1472,7 +1472,7 @@ const vendorsData = [
         reviews: 0,
         description: "Locally made chapati but with a different taste, soft & has no effect to those who doesn't like too much cooking oil..",
         tags: ["🍔 rolex", "📦 Takeaway"],
-        image: "vendor⁷.jpg",
+        image: "images/Vendors/vendor7.jpg",
         services: ["Pickup", "Delivery"],
         hours: "9:00 AM - 9:00 PM",
         specialties: ["Plain oiless Chapati", "Local Pizza", "Oily Chapati"],
