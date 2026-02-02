@@ -1458,6 +1458,24 @@ const vendorsData = [
         hours: "9:00 AM - 9:00 PM",
         specialties: ["Gourmet Chapati", "Pizza Chapati", "Dessert Chapati"],
         contact: "+256 700 123 789"
+    },
+    {
+        id: 7,
+        name: "Acramzy Muwomya Fresh Chapati     NEW",
+        location: "Kawanda, Kirinnyabigo",
+        area: "Kawanda road",
+        latitude: 0.3187,
+        longitude: 32.5864,
+        price: 1000,
+        rating: 4.1,
+        reviews: 0,
+        description: "Locally made chapati but with a different taste, soft & has no effect to those who doesn't like too much cooking oil..",
+        tags: ["🍔 rolex", "📦 Takeaway"],
+        image: "vendor⁷.jpg",
+        services: ["Pickup", "Delivery"],
+        hours: "9:00 AM - 9:00 PM",
+        specialties: ["Plain oiless Chapati", "Local Pizza", "Oily Chapati"],
+        contact: "+256 701 697 658"
     }
 ];
 
