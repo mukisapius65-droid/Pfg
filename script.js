@@ -1453,7 +1453,7 @@ const vendorsData = [
         reviews: 67,
         description: "Modern chapati spot in shopping mall.",
         tags: ["🏬 Mall", "📦 Takeaway"],
-        image: "vendor6.jpg",
+        image: "<img src="./images/Vendors/pfgchapati2.png" alt="modern city chapati"",
         services: ["Pickup", "Delivery"],
         hours: "9:00 AM - 9:00 PM",
         specialties: ["Gourmet Chapati", "Pizza Chapati", "Dessert Chapati"],
