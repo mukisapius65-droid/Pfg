@@ -1453,13 +1453,12 @@ const vendorsData = [
         reviews: 67,
         description: "Modern chapati spot in shopping mall.",
         tags: ["🏬 Mall", "📦 Takeaway"],
-        image: "<img src="./images/Vendors/pfgchapati2.png" alt="modern city chapati"",
+        image: "vendor6.jpg",
         services: ["Pickup", "Delivery"],
         hours: "9:00 AM - 9:00 PM",
         specialties: ["Gourmet Chapati", "Pizza Chapati", "Dessert Chapati"],
         contact: "+256 700 123 789"
     }
-    
 ];
 
 // ===== DOM ELEMENTS =====
