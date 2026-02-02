@@ -1444,7 +1444,7 @@ const vendorsData = [
     },
     {
         id: 6,
-        name: "Garden City Chapati",
+        name: "Garden City Chapati💎",
         location: "Garden City Mall, Kampala",
         area: "Garden City",
         latitude: 0.3187,
@@ -1480,7 +1480,7 @@ const vendorsData = [
     },
     {
         id: 8,
-        name: "PFG-CHAPATI",
+        name: "PFG-CHAPATI💎",
         location: "BUSEGA, KITAKA",
         area: "OPPOSITE STABEX GAS STATION",
         latitude: 0.3187,
@@ -1490,7 +1490,7 @@ const vendorsData = [
         reviews: 100000,
         description: "Fresh chapati delivery at your doorstep in just 10 minutes",
         tags: ["👑 VIP", "💯 SAFE"],
-        image: "images/Vendors/pfgchapati2.jpg",
+        image: "images/Vendors/pfgchapati1.png",
         services: ["Pickup", "Delivery"],
         hours: "9:00am-9:00pm",
         specialties: ["Plain oiless Chapati", "Local Pizza", "Oily Chapati"],
