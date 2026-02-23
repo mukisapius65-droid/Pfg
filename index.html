@@ -574,44 +574,106 @@ const vendorsData = [
                         <strong>Cash on Delivery</strong>
                         <small>Pay when you receive</small>
                     </div>
-                </div>
-            </label>
-            <label class="payment-option">
-                <input type="radio" name="payment" value="mobile">
-                <div class="payment-content">
-                    <i class="fas fa-mobile-alt"></i>
-                    <div>
-                        <strong>Mobile Money</strong>
-                        <small>MTN/Airtel Money</small>
-                    </div>
-                </div>
-            </label>
+<!-- Cart Sidebar -->
+<div class="cart-sidebar">
+    <div class="cart-header">
+        <a href="/" class="back-link">🔙</a>
+        <h2>Your Order</h2>
+        <button class="close-cart">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="cart-items">
+        <!-- Cart items will be added here dynamically -->
+    </div>
+    
+    <div class="cart-total">
+        <span>Total:</span>
+        <span class="total-amount">0 UGX</span>
+    </div>
+    
+    <!-- Customer Information Form -->
+    <div class="customer-info-section">
+        <h4>👤 Your Information</h4>
+        
+        <div class="customer-form">
+            <div class="form-group">
+                <label for="customerName">Full Name *</label>
+                <input 
+                    type="text" 
+                    id="customerName" 
+                    placeholder="Enter your full name"
+                    class="customer-input"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="customerPhone">Phone Number *</label>
+                <input 
+                    type="tel" 
+                    id="customerPhone" 
+                    placeholder="e.g., +256 700 123 456"
+                    class="customer-input"
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="customerEmail">Email (Optional)</label>
+                <input 
+                    type="email" 
+                    id="customerEmail" 
+                    placeholder="your.email@example.com"
+                    class="customer-input"
+                >
+            </div>
         </div>
     </div>
     
-    <!-- Order Buttons -->
-    <div class="order-buttons">
-        <button class="whatsapp-order-btn" id="whatsappOrderBtn">
-            <i class="fab fa-whatsapp"></i> Order via WhatsApp
-        </button>
-        
-        <button class="place-order-btn" id="placeOrderBtn">
-            <i class="fas fa-bolt"></i> Place Order Now
-            <small>10-min delivery guaranteed</small>
-        </button>
-        
-        <div class="order-security">
-            <i class="fas fa-shield-alt"></i>
-            <span>Secure & guaranteed satisfaction</span>
+    <!-- Location Section -->
+    <div class="location-section">
+        <div class="location-header">
+            <h4>📍 Delivery Location</h4>
+            <button class="detect-location-btn" id="detectLocationBtn">
+                <i class="fas fa-location-arrow"></i>
+                Detect My Location
+            </button>
+        </div>
+        <div class="location-input">
+            <textarea 
+                id="deliveryAddress" 
+                placeholder="Enter your complete delivery address (street, building, floor, etc.)"
+                rows="3"
+                class="customer-input"
+            ></textarea>
         </div>
     </div>
+    
+    <!-- Special Instructions -->
+    <div class="instructions-section">
+        <h4>Special Instructions</h4>
+        <textarea 
+            id="specialInstructions" 
+            placeholder="Any special delivery instructions, dietary requirements, or notes for us..."
+            rows="2"
+            class="customer-input"
+        ></textarea>
+    </div>
+    
+    <!-- Order Options -->
+    <div class="order-options">
+        <button class="checkout-btn" id="checkoutBtn">
+            <i class="fas fa-credit-card"></i>
+            Place Order
+        </button>
+        
+        <button class="whatsapp-cart-btn" id="whatsappCartBtn">
+            <i class="fab fa-whatsapp"></i>
+            Order via WhatsApp
+        </button>
+        <a href="/" class="back-link">🔙</a>
+    </div>
 </div>
-
-<!-- Cart Toggle Button -->
-<button class="cart-toggle-btn" id="cartToggleBtn">
-    <i class="fas fa-shopping-cart"></i>
-    <span class="cart-badge" id="cartBadge">0</span>
-    </button>
       <!-- Remove this from cart sidebar -->
 <!-- DELETE: <div class="whatsapp-cart-order">...</div> -->
 
