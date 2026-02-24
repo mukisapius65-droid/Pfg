@@ -3,14 +3,15 @@
     'use strict';
 
     // -------------------- Firebase Configuration --------------------
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyAGyOqUe-t04O2M6cU6Iqg8MV4V8S_a_mk",
+  authDomain: "pfg-chapati.firebaseapp.com",
+  projectId: "pfg-chapati",
+  storageBucket: "pfg-chapati.firebasestorage.app",
+  messagingSenderId: "903359666880",
+  appId: "1:903359666880:web:3f0c4e659a97336b40eb25",
+  measurementId: "G-241GDRBG8N"
+};
 
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
