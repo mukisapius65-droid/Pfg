@@ -143,7 +143,7 @@ header {
     font-weight: 600;
     cursor: pointer;
     display: flex;
-    align-items: center;
+    align-items: right;
     gap: 8px;
     min-height: 44px;
     transition: var(--transition);
@@ -2055,11 +2055,11 @@ footer {
     }
     
     .language-selector select {
-        width: 25%;
+        width: 15%;
     }
     
     .login-btn {
-        width: 25%;
+        width: 15%;
         justify-content: right;
     }
     
