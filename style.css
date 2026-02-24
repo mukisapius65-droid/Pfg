@@ -2055,17 +2055,12 @@ footer {
     }
     
     .language-selector select {
-        width: 100%;
+        width: 25%;
     }
     
     .login-btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .phone {
-        width: 100%;
-        justify-content: center;
+        width: 25%;
+        justify-content: right;
     }
     
     /* Stats */
