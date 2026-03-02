@@ -478,4 +478,549 @@ const firebaseConfig = {
     download_app: 'Wanula App',
     app_store: 'App Store',
     play_store: 'Google Play',
-    social_media: 'Emikut
+    social_media: 'Emikutu gy\'Empandwiki',
+    copyright: 'Eddembe lyonna likuumiddwa',
+    
+    // Ads
+    advertisement: 'Okulangirira',
+    sponsored: 'Eky\'ekitongole',
+    
+    // Buttons
+    continue: 'Weeyongereyo',
+    back: 'Komawo',
+    next: 'Okuddiri',
+    finish: 'Maliriza',
+    try_again: 'Gezaako nate',
+    
+    // Form Validation
+    required_field: 'Ekifo kino kyetaagisa',
+    invalid_email: 'Imeyo entali ntuufu',
+    invalid_phone: 'Namba ya ssimu entali ntuufu',
+    password_mismatch: 'Ekiyubiddwa tekifaanana',
+    
+    // Time
+    minutes: 'dakiika',
+    hours: 'essaawa',
+    days: 'naku',
+    now: 'kati',
+    today: 'leero',
+    tomorrow: 'nkya',
+    yesterday: 'jjjo',
+    
+    // Common Phrases
+    welcome: 'Tukusanyukidde',
+    thank_you: 'Weebale',
+    please: 'Nsaba',
+    sorry: 'Nsonyiwa',
+    yes: 'Ye',
+    no: 'Nedda',
+    ok: 'Ok',
+    close: 'Ggalawo',
+    open: 'Ggulawo',
+    view: 'Laba',
+    edit: 'Kyusa',
+    delete: 'Ggyako',
+    add: 'Teka',
+    remove: 'Ggyako',
+    
+    // Currency
+    ugx: 'UGX',
+    
+    // Errors
+    login_required: 'Nsaba yingira okusobola okweyongerayo',
+    fill_details: 'Jjuza ebifo byonna ebibeetaagisa',
+    order_placed: 'Okugula kuwedde bulungi!',
+    order_failed: 'Okugula kulemereddwa',
+    network_error: 'Ensobi y\'omutimbagano',
+    try_again_later: 'Gezaako nate oluvannyuma',
+    
+    // Rewards
+    points_earned: 'Olina pointi {points} (emiramwa {beansCount} gya Kikomando)',
+    redeem: 'Kozesa pointi 100 okufuna ekkaato 1000 UGX',
+    discount_applied: 'Ekkaato likozeddwa!',
+    
+    // Categories
+    all: 'Byonna',
+    popular: 'Eby\'amaanyi',
+    recommended: 'Ebirowooze',
+    new: 'Ekipya',
+    
+    // User Types
+    customer: 'Omuguzi',
+    rider: 'Rider',
+    vendor: 'Omutundisi',
+    guest: 'Omugenzi',
+    
+    // Address
+    city: 'Kibuga',
+    district: 'Disitulikiti',
+    village: 'Kyalo',
+    landmark: 'Akamenkafuna',
+    
+    // Payment
+    payment_successful: 'Okusasula kuwedde bulungi',
+    payment_failed: 'Okusasula kulemereddwa',
+    confirm_payment: 'Kakasa okusasula',
+    select_payment: 'Londa enkola y\'okusasula',
+    
+    // Order
+    order_summary: 'Eby\'ekiragiro mu bwangu',
+    items_ordered: 'Eby\'okulya eby\'aguzibwa',
+    order_total: 'Omugatte gw\'Ekiragiro',
+    
+    // Time Slots
+    asap: 'Amangu ago',
+    schedule: 'Geteekateeke',
+    estimated_time: 'Ekiseera ekyateekebwa',
+    
+    // Ratings
+    write_review: 'Wandika ekirowoozo',
+    your_rating: 'Akalulu ko',
+    submit_review: 'Ssa Ekirowoozo',
+    
+    // Search
+    search_placeholder: 'Noonya...',
+    search_results: 'Ebizuddwa',
+    no_results: 'Tewali kizuddwa',
+    
+    // Filters
+    filter: 'Yingiza',
+    sort_by: 'Tondeka ku',
+    nearest: 'Okumpi ennyo',
+    highest_rated: 'Akalulu akawagi',
+    price_low_to_high: 'Omutego okuva wansi okudda waggulu',
+    price_high_to_low: 'Omutego okuva waggulu okudda wansi',
+    
+    // Quantity
+    quantity: 'Omuwendo',
+    min: 'Wansi',
+    max: 'Waggulu',
+    
+    // Cart Actions
+    update_cart: 'Kyusa Ekitoleero',
+    clear_cart: 'Ggyako byonna',
+    cart_updated: 'Ekitoleero kikyusiddwa',
+    
+    // Checkout
+    confirm_order: 'Kakasa Ekiragiro',
+    order_confirmed: 'Ekiragiro kikakasiddwa',
+    thank_you_order: 'Weebale okugula, ekiragiro kyo kikakasiddwa',
+    
+    // Delivery
+    prepare_for_delivery: 'Teekeba okuweereza',
+    out_for_delivery: 'Kiweerezebwa',
+    delivered: 'Kiweereddwa',
+    delivery_instructions: 'Ebiragiro by\'okuweereza',
+    
+    // Support
+    customer_support: 'Obuyambi',
+    faq: 'Ebibuuzo Ebitera Okubuzibwa',
+    help_center: 'Ekitongole ky\'obuyambi',
+    live_chat: 'Okuyomba',
+    
+    // Time Expressions
+    just_now: 'kati kati',
+    minutes_ago: 'dakiika {count} eziyise',
+    hours_ago: 'essaawa {count} eziyise',
+    days_ago: 'naku {count} eziyise',
+    
+    // Distance
+    meters: 'mita',
+    kilometers: 'kilomita',
+    
+    // Weather (optional, for delivery conditions)
+    weather: 'Obudde',
+    rain: 'Enkuba',
+    sunny: 'Njuba',
+    cloudy: 'Ebire',
+    
+    // Holidays
+    holiday: 'Olukuŋŋwana',
+    special_hours: 'Essawa ezenjawulo',
+    
+    // Emergency
+    emergency: 'Okwanguwo',
+    report_issue: 'Teekawo ekizibu',
+    
+    // Feedback
+    feedback: 'Ekirowoozo',
+    rate_experience: 'Londa akalulu ku lwa okukozesa',
+    tell_us_more: 'Tubuulire ebisingawo',
+    
+    // Invitations
+    invite_friend: 'Yita mukwano',
+    share_app: 'Gaba App',
+    referral_code: 'Koodi y\'okuyita',
+    
+    // Loyalty
+    loyalty_points: 'Pointi z\'obwesigwa',
+    vip_status: 'Ndidila ya VIP',
+    
+    // Announcements
+    announcement: 'Okulangirira',
+    read_more: 'Soma ebisingawo',
+    
+    // System
+    system_update: 'Enteekateeka ekyusiddwa',
+    app_version: 'Endandika ya App',
+    check_for_updates: 'Kebera enkyusakyusa'
+        }
+    };
+
+    // -------------------- Menu Items --------------------
+    const menuItems = [
+        // Breakfast
+        { id: 'b1', category: 'breakfast', name: 'Chapati Plain', price: 1000, image: '/images/chapati.jpg', description: 'Soft, fluffy plain chapati made with premium wheat flour.' },
+        { id: 'b2', category: 'breakfast', name: 'Mandazi', price: 500, image: '/images/mandazi.jpg', description: 'Soft, fluffy East African doughnuts that are slightly sweet.' },
+        { id: 'b3', category: 'breakfast', name: 'Tea', price: 500, image: '/images/tea.jpg', description: 'Hot milk tea - perfect with chapati.' },
+        // Lunch
+        { id: 'l1', category: 'lunch', name: 'Kikomando', price: 1500, image: '/images/kikomando.jpg', description: 'Chapati served with delicious beans, a popular Ugandan street food.' },
+        { id: 'l2', category: 'lunch', name: 'Rolex', price: 1500, image: '/images/rolex.jpg', description: 'Ugandan favorite - chapati wrapped around eggs, vegetables.' },
+        { id: 'l3', category: 'lunch', name: 'Chapati Beans', price: 2000, image: '/images/chapati-beans.jpg', description: 'Chapati with extra beans and vegetables.' },
+        // Dinner
+        { id: 'd1', category: 'dinner', name: 'Pizza', price: 2500, image: '/images/pizza.jpg', description: 'Delicious pizza with a variety of toppings, chapati-style crust.' },
+        { id: 'd2', category: 'dinner', name: 'Rolipizza', price: 2000, image: '/images/rolipizza.jpg', description: 'Our unique creation - chapati rolled with pizza toppings.' },
+        { id: 'd3', category: 'dinner', name: 'Chapati Meal', price: 3000, image: '/images/chapati-meal.jpg', description: 'Chapati served with beans, vegetables, and your choice of meat.' },
+        // Drinks
+        { id: 'dr1', category: 'drinks', name: 'Water', price: 500, image: '/images/water.jpg', description: 'Pure drinking water (500ml)' },
+        { id: 'dr2', category: 'drinks', name: 'Soda', price: 1000, image: '/images/soda.jpg', description: 'Chilled soda - Coke, Fanta, Sprite' },
+        { id: 'dr3', category: 'drinks', name: 'Yoghurt', price: 1500, image: '/images/yoghurt.jpg', description: 'Creamy yoghurt - plain or strawberry' },
+        { id: 'dr4', category: 'drinks', name: 'Juice', price: 1500, image: '/images/juice.jpg', description: 'Fresh fruit juice - passion, mango, pineapple' }
+    ];
+
+    // -------------------- Utility Functions --------------------
+    function t(key, replacements = {}) {
+        let text = translations[currentLang]?.[key] || translations['en'][key] || key;
+        for (let r in replacements) {
+            text = text.replace(`{${r}}`, replacements[r]);
+        }
+        return text;
+    }
+
+    function updateLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('pfgLang', lang);
+        // Update all elements with data-i18n attribute
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = t(key);
+            } else if (el.tagName === 'OPTION') {
+                el.textContent = t(key);
+            } else {
+                el.textContent = t(key);
+            }
+        });
+        // Update dynamic content
+        updateCart();
+        if (elements.menuGrid) renderMenu(document.querySelector('.category-btn.active')?.dataset.category || 'breakfast');
+    }
+
+    function showMessage(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `message-popup ${type}`;
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed; top: 20px; right: 20px; padding: 12px 24px;
+            background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
+            color: white; border-radius: 8px; z-index: 3000; animation: slideInRight 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    function showLoading(show) {
+        if (elements.loadingSpinner) {
+            elements.loadingSpinner.classList.toggle('active', show);
+        }
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    function calculateSubtotal() {
+        return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    }
+
+    function calculateDeliveryFee(subtotal) {
+        return subtotal >= 10000 ? 0 : 2000; // Free delivery above 10,000 UGX
+    }
+
+    function calculateTotal() {
+        const subtotal = calculateSubtotal();
+        const delivery = calculateDeliveryFee(subtotal);
+        const discount = parseInt(sessionStorage.getItem('discount') || '0');
+        return subtotal + delivery - discount;
+    }
+
+    function getDistance(loc1, loc2) {
+        if (!loc1 || !loc2) return Infinity;
+        const R = 6371;
+        const dLat = (loc2.lat - loc1.lat) * Math.PI / 180;
+        const dLon = (loc2.lng - loc1.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(loc1.lat * Math.PI/180) * Math.cos(loc2.lat * Math.PI/180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    // -------------------- DOM Element Initialization --------------------
+    function initElements() {
+        const ids = [
+            'mobileMenuBtn', 'navLinks', 'cartIcon', 'cartSidebar', 'closeCartBtn', 'overlay',
+            'cartItems', 'cartCount', 'subtotalAmount', 'totalAmount', 'discountDisplay',
+            'discountAmount', 'deliveryFee', 'checkoutBtn', 'whatsappCartBtn',
+            'loadingSpinner', 'rewardInfo', 'loginBtn', 'logoutBtn', 'userInfo',
+            'userPhoto', 'userName', 'riderLink', 'vendorLink', 'ordersLink', 'langSelect',
+            'detectLocationBtn', 'locationStatus', 'vendorSearch', 'searchVendorsBtn',
+            'vendorGrid', 'menuGrid', 'riderMap', 'assignedOrders', 'vendorOrders',
+            'customerOrders', 'adSpace', 'cartCustomerName', 'cartCustomerPhone',
+            'cartDeliveryAddress', 'cartSpecialInstructions', 'roleSelector',
+            'roleSelect', 'saveRoleBtn', 'profileName', 'profilePhone', 'profileEmail',
+            'profileAddress', 'businessName', 'businessAddress', 'businessHours',
+            'vehicleType', 'licensePlate', 'saveProfileBtn', 'changePhotoBtn',
+            'pushNotifications', 'smsNotifications', 'emailNotifications',
+            'settingsLangSelect', 'changePasswordBtn', 'deleteAccountBtn',
+            'riderOnlineToggle', 'riderStatusText', 'todayEarnings', 'totalEarnings',
+            'deliveriesToday', 'riderRating', 'vendorTodayOrders', 'vendorTotalSales',
+            'vendorPendingOrders', 'vendorRating', 'updateMenuBtn', 'viewReviewsBtn',
+            'earningsReportBtn', 'orderTrackingModal', 'trackingMap', 'riderPhoto',
+            'riderName', 'riderPhone', 'pendingTime', 'acceptedTime', 'preparingTime',
+            'outForDeliveryTime', 'deliveredTime', 'statusPending', 'statusAccepted',
+            'statusPreparing', 'statusOutForDelivery', 'statusDelivered'
+        ];
+        ids.forEach(id => elements[id] = document.getElementById(id));
+        elements.categoryButtons = document.querySelectorAll('.category-btn');
+        elements.orderTabs = document.querySelectorAll('.order-tab');
+    }
+
+    // -------------------- Scroll Behavior (Hide header items on scroll down) --------------------
+    function initScrollBehavior() {
+        let lastScrollY = window.scrollY;
+        const header = document.querySelector('header');
+        const headerTop = document.querySelector('.header-top');
+        const headerActions = document.querySelector('.header-actions');
+        const logo = document.querySelector('.logo');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > lastScrollY && window.scrollY > 100) {
+                // Scrolling down – hide header actions (language, user auth, phone) but keep logo
+                if (headerActions) headerActions.style.transform = 'translateY(-100%)';
+                if (headerTop) headerTop.style.paddingBottom = '5px';
+            } else {
+                // Scrolling up – show header actions
+                if (headerActions) headerActions.style.transform = 'translateY(0)';
+                if (headerTop) headerTop.style.paddingBottom = '15px';
+            }
+            lastScrollY = window.scrollY;
+        });
+    }
+
+    // -------------------- Mobile Menu --------------------
+    function initMobileMenu() {
+        if (!elements.mobileMenuBtn || !elements.navLinks) return;
+        elements.mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            elements.navLinks.classList.toggle('active');
+        });
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                elements.navLinks.classList.remove('active');
+            });
+        });
+        document.addEventListener('click', (e) => {
+            if (!elements.navLinks.contains(e.target) && !elements.mobileMenuBtn.contains(e.target)) {
+                elements.navLinks.classList.remove('active');
+            }
+        });
+    }
+
+    // -------------------- Authentication --------------------
+    function initAuth() {
+        auth.onAuthStateChanged(async user => {
+            if (user) {
+                currentUser = user;
+                elements.loginBtn.style.display = 'none';
+                elements.userInfo.style.display = 'flex';
+                elements.userPhoto.src = user.photoURL || '/images/default-avatar.png';
+                elements.userName.textContent = user.displayName || user.email;
+
+                // Load user data from Firestore
+                await loadUserFromFirestore(user.uid);
+                // Load cart from Firestore or merge with local
+                await loadCartFromFirestore(user.uid);
+
+                // Show role-specific links
+                if (userRole === 'rider') elements.riderLink.style.display = 'list-item';
+                if (userRole === 'vendor') elements.vendorLink.style.display = 'list-item';
+                if (userRole === 'customer') elements.ordersLink.style.display = 'list-item';
+
+                // Initialize dashboards if on correct page
+                if (userRole === 'rider' && window.location.hash === '#rider-dashboard') initRiderDashboard();
+                if (userRole === 'vendor' && window.location.hash === '#vendor-dashboard') initVendorDashboard();
+            } else {
+                currentUser = null;
+                userRole = null;
+                elements.loginBtn.style.display = 'flex';
+                elements.userInfo.style.display = 'none';
+                elements.riderLink.style.display = 'none';
+                elements.vendorLink.style.display = 'none';
+                elements.ordersLink.style.display = 'none';
+                // Load cart from localStorage
+                loadCartFromLocalStorage();
+            }
+            updateCart();
+        });
+
+        elements.loginBtn.addEventListener('click', () => {
+            auth.signInWithPopup(googleProvider)
+                .then(result => {
+                    return db.collection('users').doc(result.user.uid).get();
+                })
+                .then(doc => {
+                    if (!doc.exists) {
+                        // New user – show role selector
+                        elements.roleSelector.style.display = 'flex';
+                    } else {
+                        elements.roleSelector.style.display = 'none';
+                    }
+                })
+                .catch(error => showMessage(error.message, 'error'));
+        });
+
+        elements.logoutBtn.addEventListener('click', () => auth.signOut());
+
+        elements.saveRoleBtn.addEventListener('click', async () => {
+            const role = elements.roleSelect.value;
+            if (!currentUser) return;
+            try {
+                await db.collection('users').doc(currentUser.uid).set({
+                    email: currentUser.email,
+                    name: currentUser.displayName,
+                    role: role,
+                    rewards: { points: 0, beansCount: 0 },
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                userRole = role;
+                elements.roleSelector.style.display = 'none';
+                showMessage('Role saved!', 'success');
+                location.reload(); // Refresh to show correct dashboard
+            } catch (error) {
+                showMessage('Error saving role', 'error');
+            }
+        });
+    }
+
+    async function loadUserFromFirestore(uid) {
+        try {
+            const userDoc = await db.collection('users').doc(uid).get();
+            if (userDoc.exists) {
+                const data = userDoc.data();
+                userRole = data.role || 'customer';
+                rewards = data.rewards || { points: 0, beansCount: 0 };
+                // Fill profile fields
+                if (elements.profileName) elements.profileName.value = data.name || '';
+                if (elements.profilePhone) elements.profilePhone.value = data.phone || '';
+                if (elements.profileEmail) elements.profileEmail.value = currentUser.email;
+                if (elements.profileAddress) elements.profileAddress.value = data.address || '';
+                if (elements.businessName) elements.businessName.value = data.businessName || '';
+                if (elements.businessAddress) elements.businessAddress.value = data.businessAddress || '';
+                if (elements.businessHours) elements.businessHours.value = data.businessHours || '';
+                if (elements.vehicleType) elements.vehicleType.value = data.vehicleType || 'motorcycle';
+                if (elements.licensePlate) elements.licensePlate.value = data.licensePlate || '';
+            }
+        } catch (error) {
+            console.error('Error loading user:', error);
+        }
+    }
+
+    async function loadCartFromFirestore(uid) {
+        try {
+            const cartDoc = await db.collection('carts').doc(uid).get();
+            if (cartDoc.exists) {
+                cart = cartDoc.data().items || [];
+            } else {
+                const localCart = loadCartFromLocalStorage();
+                if (localCart.length > 0) {
+                    cart = localCart;
+                    await saveCartToFirestore();
+                }
+            }
+        } catch (error) {
+            console.error('Error loading cart from Firestore:', error);
+            loadCartFromLocalStorage();
+        }
+    }
+
+    function loadCartFromLocalStorage() {
+        const saved = localStorage.getItem('pfgCart');
+        if (saved) {
+            try {
+                cart = JSON.parse(saved);
+            } catch { cart = []; }
+        } else {
+            cart = [];
+        }
+        return cart;
+    }
+
+    async function saveCartToFirestore() {
+        if (currentUser) {
+            try {
+                await db.collection('carts').doc(currentUser.uid).set({
+                    items: cart,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) {
+                console.error('Error saving cart:', error);
+            }
+        }
+        localStorage.setItem('pfgCart', JSON.stringify(cart));
+    }
+
+    // -------------------- Menu Rendering --------------------
+    function renderMenu(category = 'breakfast') {
+        if (!elements.menuGrid) return;
+        const filtered = menuItems.filter(item => item.category === category);
+        elements.menuGrid.innerHTML = filtered.map(item => `
+            <div class="menu-item">
+                <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='/images/placeholder.jpg'">
+                <div class="menu-item-content">
+                    <h3>${item.name}</h3>
+                    <p>${item.description}</p>
+                    <div class="price">
+                        <span>${item.price.toLocaleString()} UGX</span>
+                        <button class="add-to-cart" 
+                            data-id="${item.id}" 
+                            data-name="${item.name}" 
+                            data-price="${item.price}" 
+                            data-image="${item.image}">${t('add_to_cart')}</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', handleAddToCart);
+        });
+    }
+
+    function initCategoryTabs() {
+        elements.categoryButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                elements.categoryButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderMenu(btn.dataset.category);
+            });
+        });
+    }
+
+    // -------------------- Cart Functions --------------------
+    function handleAddToCart(e) {
+        
