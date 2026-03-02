@@ -295,10 +295,10 @@ const firebaseConfig = {
         lg: {
     // General
     site_name: 'PFG Chapati',
-    home: 'Maka',
+    home: 'Waka',
     menu: 'Menu',
     why: 'Lwaki PFG',
-    vendors: 'Abatundisi',
+    vendors: 'Abatundisa',
     rider_dashboard: 'Rider Dashboard',
     vendor_dashboard: 'Vendor Dashboard',
     my_orders: 'Ebiragiro Byange',
@@ -310,37 +310,37 @@ const firebaseConfig = {
     save_changes: 'Kwatira Enkyusakyusa',
     cancel: 'Ggyako',
     confirm: 'Kakasa',
-    loading: 'Kitunulwa...',
+    loading: 'Kitunulwamu...',
     error: 'Ensobi',
     success: 'Byakola',
     warning: 'Okwegendereza',
     info: 'Amawulire',
     
     // Hero Section
-    hero_title: 'Emmere Emiyungu Eweerezebwa Mu Ddakiika 10',
-    hero_subtitle: 'Gula emmere omuyungu okuva wonna mu Kampala era eweerezebwe ku luggi lwo mu ddakiika 10 zokka!',
+    hero_title: 'Emmere Ennyangu Eweerezebwa Mu Ddakiika 10',
+    hero_subtitle: 'Gula emmere ennyangu okuva wonna mu Kampala era eweerezebwe ku luggi lwo mu ddakiika 10 zokka!',
     order_now: 'Gula Kati',
     
     // Features
     why_title: 'Lwaki Olonda PFG Chapati?',
-    feature1_title: 'Okuweereza Mu Ddakiika 10',
-    feature1_desc: 'Tukakasa okuweereza mu ddakiika 10 wonna mu Kampala. Emiyungu era ebuguma!',
-    feature2_title: 'Ebirungo Ebirowooze',
-    feature2_desc: 'Tukutuusa ku bakola abakozesa ebirungo ebirowooze ennyo.',
+    feature1_title: 'Ekuweereza Mu Ddakiika 10',
+    feature1_desc: 'Tukakasa okuweereza mu ddakiika 10 wonna mu Kampala. Ennyangu era ebuguma!',
+    feature2_title: 'Ebirungo Ebirongoose',
+    feature2_desc: 'Tukutuusa ku bakola abakozesa ebirungo ebirongoofu ennyo.',
     feature3_title: 'Okuweereza Bwerere',
-    feature3_desc: 'Okuweereza bwerere ku nsasula ezisukka 10,000 UGX. Tewali nsasula ekyama.',
+    feature3_desc: 'Okuweereza bwerere ku nsasula ezisukka 10,000 UGX. Tewali nsasula yakyama.',
     feature4_title: 'Enjawulo y\'Emmere',
     feature4_desc: 'Okuva ku chapati yokka okutuuka ku rolex ne rolipizza – tusobola byonna.',
     
     // Menu
     our_menu: 'Emmere Yaffe',
     breakfast: 'Ekyenkya',
-    lunch: 'Emisana',
-    dinner: 'Eggulo',
+    lunch: 'Ekyemisana',
+    dinner: 'Ekyeggulo',
     drinks: 'Ebyokunywa',
     add_to_cart: 'Teka mu Kitooleero',
     added_to_cart: '{name} kitekeddwa mu kitooleero!',
-    price: 'Omutego',
+    price: 'Omuwendo',
     quantity: 'Omuwendo',
     description: 'Okunnyonnyola',
     
@@ -356,7 +356,7 @@ const firebaseConfig = {
     delivery_details: 'Eby\'okuweereza',
     payment_method: 'Enkola y\'okusasula',
     cash_on_delivery: 'Ssasula ng\'ofuna',
-    mobile_money: 'Mobile Money',
+    mobile_money: 'Mobayiro Mane',
     credit_card: 'Kaadi ya Ssimu',
     place_order: 'Sasula',
     
@@ -372,21 +372,21 @@ const firebaseConfig = {
     status_pending: 'Kirinda',
     status_assigned: 'Kiweereddwa',
     status_accepted: 'Kikkiriziddwa',
-    status_preparing: 'Kiteekebwa',
-    status_out_for_delivery: 'Kiweerezebwa',
-    status_delivered: 'Kiweereddwa',
-    status_cancelled: 'Kusazibbwa',
-    track_order: 'Londola Ebiragiro',
+    status_preparing: 'Kiteekebwateekebwa',
+    status_out_for_delivery: 'Kiteerebwa',
+    status_delivered: 'Kiweerezeddwa',
+    status_cancelled: 'Kusazibbwaamu',
+    track_order: 'Londoola Ebiragiro',
     
     // Vendor Directory
     find_vendors: 'Funa Abatundisi Abeesigwa mu Kampala',
-    vendors_sub: 'Emyaka, emmere emiyungu — weeyungine n\'abatundisi abali okumpi naawe.',
+    vendors_sub: 'Emyaka, emmere ennyangu — weeyunge n\'abatundisi abali okumpi naawe.',
     detect_location: 'Ndaba wendi',
     location_detected: 'Wendi Olabiddwa!',
     location_failed: 'Okulaba Wendi Kulemereddwa',
     search: 'Noonya',
-    search_vendors: 'Noonya abatundisi',
-    km_away: '{distance} km ku weewawo',
+    search_vendors: 'Noonya abatundisa',
+    km_away: '{distance} km okuva',
     rating: 'Akalulu',
     
     // Rider Dashboard
@@ -398,16 +398,16 @@ const firebaseConfig = {
     online: 'Ndi ku mutimbagano',
     offline: 'Ndi wabweru',
     assigned_orders: 'Ebiragiro By\'oteekeddwa',
-    delivery_history: 'Ebyafaayo by\'Okuweereza',
+    delivery_history: 'Ebyafaayo by\'Oweereza',
     accept: 'Kkiriza',
-    mark_delivered: 'Mannya ng\'ebiweereddwa',
+    mark_delivered: 'Mannya ebiweereddwayo',
     complete_delivery: 'Maliriza Okuweereza',
     rider_location: 'Waliwo Rider',
     
     // Vendor Dashboard
     vendor_dashboard: 'Vendor Dashboard',
     today_orders: 'Ebiragiro Bya Leero',
-    total_sales: 'Ebyaguzze Byonna',
+    total_sales: 'Byebaguzze Byonna',
     pending_orders: 'Ebiragiro Ebirinda',
     recent_orders: 'Ebiragiro Ebipya',
     average_rating: 'Akalulu Akawereza',
@@ -417,7 +417,7 @@ const firebaseConfig = {
     add_new_item: 'Teka Emere Empya',
     current_items: 'Eby\'okulya Ebiriwo',
     item_name: 'Erinnya ly\'Emmere',
-    item_price: 'Omutego gw\'Emmere',
+    item_price: 'Ebisale by\'Emmere',
     item_category: 'Ekika ky\'Emmere',
     item_description: 'Okunnyonnyola kw\'Emmere',
     item_image: 'Ekifaananyi ky\'Emmere',
@@ -426,17 +426,17 @@ const firebaseConfig = {
     profile: 'Profilu Yange',
     edit_profile: 'Kyusa Profilu',
     change_photo: 'Kyusa Ekifaananyi',
-    personal_info: 'Ebyo ku Nze',
-    business_info: 'Eby\'Obusuubuzi',
-    business_name: 'Erinnya ly\'Obusuubuzi',
-    business_address: 'Endagiriro y\'Obusuubuzi',
+    personal_info: 'Ebinkwaatako',
+    business_info: 'Ebikwaata ku bizinensi',
+    business_name: 'Erinnya ly\'abizinensi',
+    business_address: 'Endagiriro y\'abizinensi',
     business_hours: 'Essawa z\'Okukola',
-    vehicle_info: 'Eby\'Ekkubo',
-    vehicle_type: 'Ekika ky\'Ekkubo',
+    vehicle_info: 'Ebikwaata kukiduka',
+    vehicle_type: 'Ekika ky\'Ekiduka',
     bicycle: 'Egaali',
     motorcycle: 'Piki piki',
     car: 'Emotoka',
-    license_plate: 'Namba y\'Ekkubo',
+    license_plate: 'Namba Puleeti',
     
     // Settings
     settings: 'Enteekateeka',
@@ -447,38 +447,38 @@ const firebaseConfig = {
     language: 'Olulimi',
     payment_methods: 'Enkola z\'Okusasula',
     privacy_security: 'Ekyama n\'Okwerinda',
-    change_password: 'Kyusa Kiyubiddwa',
+    change_password: 'Kyusa ennyukuta/ennaamba z'ekyaama',
     delete_account: 'Ggyako Akaawunti',
-    delete_account_confirm: 'Okakasa n\'oyagala okuggyako akaawunti yo? Ekyo tokikyalidde!',
+    delete_account_confirm: 'Okakasa ng\'oyagala okuggyako akaawunti yo? Ekyo tokizibbwa mabega!',
     
     // Order Tracking
     track_order: 'Londola Ebiragiro',
     order_details: 'Eby\'Ekiragiro',
     order_number: 'Namba y\'Ekiragiro',
     order_date: 'Olunaku lw\'Ekiragiro',
-    estimated_delivery: 'Okuweereza Kuteekebwa',
-    rider_info: 'Ebya Rider',
-    rider_name: 'Erinnya lya Rider',
-    rider_phone: 'Essimu ya Rider',
+    estimated_delivery: 'Okuweereza Kuteeberezeebwa',
+    rider_info: 'Ebikwaata ku Muvuzi',
+    rider_name: 'Erinnya ly\'Omuvuzi',
+    rider_phone: 'Essimu y\'Omuvuzi',
     order_timeline: 'Enkola y\'Ekiragiro',
     pending_time: 'Ekiseera ky\'Okulinda',
     accepted_time: 'Ekiseera ky\'Okukkiriza',
-    preparing_time: 'Ekiseera ky\'Okuteekeba',
-    out_for_delivery_time: 'Ekiseera ky\'Okuweereza',
-    delivered_time: 'Ekiseera ky\'Okuweereza',
+    preparing_time: 'Ekiseera ky\'Okuteekateeka',
+    out_for_delivery_time: 'Obudde mubiteereddwa',
+    delivered_time: 'Obudde mwebiwerezeddwa',
     
     // Footer
-    quick_links: 'Empiisa',
-    contact: 'Okutukirira',
-    contact_us: 'Tukirire',
+    quick_links: 'Empisa',
+    contact: 'Okututukirira',
+    contact_us: 'Tukubiire',
     privacy: 'Enkola y\'Ebyama',
-    terms: 'Embiiko z\'Okukozesa',
+    terms: 'Empisa z\'Okukozesa',
     cookies: 'Enkola y\'Cookies',
-    footer_desc: 'Okutuusa abatundisi n\'abaguzi mu Kampala n\'obukakafu bwa ddakiika 10.',
+    footer_desc: 'Okutuusa abatundisa eri abaguzi mu Kampala n\'obukakafu bwa ddakiika 10.',
     download_app: 'Wanula App',
     app_store: 'App Store',
     play_store: 'Google Play',
-    social_media: 'Emikutu gy\'Empandwiki',
+    social_media: 'Emikutu gy\'Emitimbagano',
     copyright: 'Eddembe lyonna likuumiddwa',
     
     // Ads
@@ -494,9 +494,9 @@ const firebaseConfig = {
     
     // Form Validation
     required_field: 'Ekifo kino kyetaagisa',
-    invalid_email: 'Imeyo entali ntuufu',
-    invalid_phone: 'Namba ya ssimu entali ntuufu',
-    password_mismatch: 'Ekiyubiddwa tekifaanana',
+    invalid_email: 'Imeyo etali ntuufu',
+    invalid_phone: 'Namba ya ssimu etali ntuufu',
+    password_mismatch: 'Ennyukuta/ennamba z\'ekyaama' tezifaanagana',
     
     // Time
     minutes: 'dakiika',
@@ -505,7 +505,7 @@ const firebaseConfig = {
     now: 'kati',
     today: 'leero',
     tomorrow: 'nkya',
-    yesterday: 'jjjo',
+    yesterday: 'jjo',
     
     // Common Phrases
     welcome: 'Tukusanyukidde',
@@ -528,7 +528,7 @@ const firebaseConfig = {
     
     // Errors
     login_required: 'Nsaba yingira okusobola okweyongerayo',
-    fill_details: 'Jjuza ebifo byonna ebibeetaagisa',
+    fill_details: 'Jjuza ebifo byonna eb\'etaagisa',
     order_placed: 'Okugula kuwedde bulungi!',
     order_failed: 'Okugula kulemereddwa',
     network_error: 'Ensobi y\'omutimbagano',
@@ -542,20 +542,20 @@ const firebaseConfig = {
     // Categories
     all: 'Byonna',
     popular: 'Eby\'amaanyi',
-    recommended: 'Ebirowooze',
+    recommended: 'byotaanye kusubwa',
     new: 'Ekipya',
     
     // User Types
     customer: 'Omuguzi',
     rider: 'Rider',
-    vendor: 'Omutundisi',
-    guest: 'Omugenzi',
+    vendor: 'Omutundisa',
+    guest: 'Omugenyi',
     
     // Address
     city: 'Kibuga',
     district: 'Disitulikiti',
     village: 'Kyalo',
-    landmark: 'Akamenkafuna',
+    landmark: 'Pinu',
     
     // Payment
     payment_successful: 'Okusasula kuwedde bulungi',
@@ -570,8 +570,8 @@ const firebaseConfig = {
     
     // Time Slots
     asap: 'Amangu ago',
-    schedule: 'Geteekateeke',
-    estimated_time: 'Ekiseera ekyateekebwa',
+    schedule: 'Ngeteekateeke',
+    estimated_time: 'Ekiseera ekiteeberezebwa',
     
     // Ratings
     write_review: 'Wandika ekirowoozo',
@@ -580,16 +580,16 @@ const firebaseConfig = {
     
     // Search
     search_placeholder: 'Noonya...',
-    search_results: 'Ebizuddwa',
+    search_results: 'Ebizuliddwa',
     no_results: 'Tewali kizuddwa',
     
     // Filters
     filter: 'Yingiza',
-    sort_by: 'Tondeka ku',
+    sort_by: 'Tendeka ne',
     nearest: 'Okumpi ennyo',
-    highest_rated: 'Akalulu akawagi',
-    price_low_to_high: 'Omutego okuva wansi okudda waggulu',
-    price_high_to_low: 'Omutego okuva waggulu okudda wansi',
+    highest_rated: 'Akalulu akangi',
+    price_low_to_high: 'Ebisale okuva wansi okudda waggulu',
+    price_high_to_low: 'Ebisale okuva waggulu okudda wansi',
     
     // Quantity
     quantity: 'Omuwendo',
@@ -607,8 +607,8 @@ const firebaseConfig = {
     thank_you_order: 'Weebale okugula, ekiragiro kyo kikakasiddwa',
     
     // Delivery
-    prepare_for_delivery: 'Teekeba okuweereza',
-    out_for_delivery: 'Kiweerezebwa',
+    prepare_for_delivery: 'Teekateeka okuweereza/okuweerezebwa',
+    out_for_delivery: 'Kiteeredwa',
     delivered: 'Kiweereddwa',
     delivery_instructions: 'Ebiragiro by\'okuweereza',
     
@@ -616,7 +616,7 @@ const firebaseConfig = {
     customer_support: 'Obuyambi',
     faq: 'Ebibuuzo Ebitera Okubuzibwa',
     help_center: 'Ekitongole ky\'obuyambi',
-    live_chat: 'Okuyomba',
+    live_chat: 'Obubaka layivu',
     
     // Time Expressions
     just_now: 'kati kati',
@@ -635,20 +635,20 @@ const firebaseConfig = {
     cloudy: 'Ebire',
     
     // Holidays
-    holiday: 'Olukuŋŋwana',
+    holiday: 'Oluwummula',
     special_hours: 'Essawa ezenjawulo',
     
     // Emergency
-    emergency: 'Okwanguwo',
-    report_issue: 'Teekawo ekizibu',
+    emergency: 'Okwanguwa',
+    report_issue: 'loopa ekizibu',
     
     // Feedback
     feedback: 'Ekirowoozo',
-    rate_experience: 'Londa akalulu ku lwa okukozesa',
+    rate_experience: 'Londa akalulu ku mpulira yenkukozesa',
     tell_us_more: 'Tubuulire ebisingawo',
     
     // Invitations
-    invite_friend: 'Yita mukwano',
+    invite_friend: 'Yita mukwanogwo',
     share_app: 'Gaba App',
     referral_code: 'Koodi y\'okuyita',
     
