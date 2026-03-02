@@ -397,4 +397,257 @@
                         <label data-i18n="phone_number">Phone Number</label>
                         <input type="tel" id="profilePhone">
                     </div>
-       
+                    <div class="form-group">
+                        <label data-i18n="email">Email</label>
+                        <input type="email" id="profileEmail" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="default_address">Default Delivery Address</label>
+                        <textarea id="profileAddress"></textarea>
+                    </div>
+                    
+                    <!-- Vendor-specific fields -->
+                    <div id="vendorFields" style="display: none;">
+                        <h3 data-i18n="business_info">Business Information</h3>
+                        <div class="form-group">
+                            <label data-i18n="business_name">Business Name</label>
+                            <input type="text" id="businessName">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="business_address">Business Address</label>
+                            <input type="text" id="businessAddress">
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="business_hours">Business Hours</label>
+                            <input type="text" id="businessHours" placeholder="e.g., 8am - 8pm">
+                        </div>
+                    </div>
+                    
+                    <!-- Rider-specific fields -->
+                    <div id="riderFields" style="display: none;">
+                        <h3 data-i18n="vehicle_info">Vehicle Information</h3>
+                        <div class="form-group">
+                            <label data-i18n="vehicle_type">Vehicle Type</label>
+                            <select id="vehicleType">
+                                <option value="bicycle">Bicycle</option>
+                                <option value="motorcycle">Motorcycle</option>
+                                <option value="car">Car</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label data-i18n="license_plate">License Plate</label>
+                            <input type="text" id="licensePlate">
+                        </div>
+                    </div>
+                    
+                    <button id="saveProfileBtn" class="btn-primary" data-i18n="save_changes">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Settings Page -->
+    <section class="settings-page" id="settings" style="display: none;">
+        <div class="container">
+            <h2 data-i18n="settings">Settings</h2>
+            
+            <div class="settings-content">
+                <div class="settings-section">
+                    <h3 data-i18n="notifications">Notifications</h3>
+                    <label class="switch-label">
+                        <span data-i18n="push_notifications">Push Notifications</span>
+                        <input type="checkbox" id="pushNotifications" checked>
+                    </label>
+                    <label class="switch-label">
+                        <span data-i18n="sms_notifications">SMS Notifications</span>
+                        <input type="checkbox" id="smsNotifications" checked>
+                    </label>
+                    <label class="switch-label">
+                        <span data-i18n="email_notifications">Email Notifications</span>
+                        <input type="checkbox" id="emailNotifications" checked>
+                    </label>
+                </div>
+                
+                <div class="settings-section">
+                    <h3 data-i18n="language">Language</h3>
+                    <select id="settingsLangSelect">
+                        <option value="en">🇬🇧 English</option>
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="zh">🇨🇳 中文</option>
+                        <option value="sw">🇰🇪 Kiswahili</option>
+                        <option value="lg">🇺🇬 Luganda</option>
+                    </select>
+                </div>
+                
+                <div class="settings-section">
+                    <h3 data-i18n="payment_methods">Payment Methods</h3>
+                    <div class="payment-methods">
+                        <label class="radio-label">
+                            <input type="radio" name="paymentMethod" value="cash" checked>
+                            <span data-i18n="cash_on_delivery">Cash on Delivery</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="paymentMethod" value="mobile_money">
+                            <span data-i18n="mobile_money">Mobile Money</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="paymentMethod" value="card">
+                            <span data-i18n="credit_card">Credit Card</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3 data-i18n="privacy_security">Privacy & Security</h3>
+                    <button id="changePasswordBtn" class="btn-secondary" data-i18n="change_password">Change Password</button>
+                    <button id="deleteAccountBtn" class="btn-danger" data-i18n="delete_account">Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Customer Info Form (hidden, used in cart) - Note: IDs match cart fields -->
+    <div class="customer-info-form" style="display: none;">
+        <input type="text" id="customerName" class="customer-input" placeholder="Your name">
+        <input type="tel" id="customerPhone" class="customer-input" placeholder="Phone number">
+        <input type="email" id="customerEmail" class="customer-input" placeholder="Email (optional)">
+        <textarea id="deliveryAddress" class="customer-input" placeholder="Delivery address"></textarea>
+        <textarea id="specialInstructions" class="customer-input" placeholder="Special instructions"></textarea>
+    </div>
+
+    <!-- Ad Space -->
+    <div class="ad-space" id="adSpace"></div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>PFG Chapati</h3>
+                    <p data-i18n="footer_desc">Bridging snack centers and customers in Kampala with a 10-minute guarantee.</p>
+                    <div class="social-icons">
+                        <a href="https://facebook.com/pfgchapatiug" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://twitter.com/pfgchapati" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://instagram.com/pfgchapati" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="https://wa.me/256703055329" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3 data-i18n="quick_links">Quick Links</h3>
+                    <a href="#menu" data-i18n="menu">Menu</a>
+                    <a href="#features" data-i18n="why">Why PFG</a>
+                    <a href="#vendors" data-i18n="vendors">Vendors</a>
+                    <a href="#faq" data-i18n="faq">FAQ</a>
+                    <a href="#contact" data-i18n="contact_us">Contact Us</a>
+                </div>
+                <div class="footer-column">
+                    <h3 data-i18n="contact">Contact</h3>
+                    <p><i class="fas fa-phone"></i> <a href="tel:+256703055329">+256 703 055 329</a></p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:pfgchapati@gmail.com">pfgchapati@gmail.com</a></p>
+                    <p><i class="fas fa-map-marker-alt"></i> Kampala, Uganda</p>
+                </div>
+                <div class="footer-column">
+                    <h3 data-i18n="download_app">Download App</h3>
+                    <a href="#" class="app-store-btn">
+                        <img src="images/app-store.svg" alt="App Store">
+                    </a>
+                    <a href="#" class="play-store-btn">
+                        <img src="images/play-store.svg" alt="Google Play">
+                    </a>
+                </div>
+            </div>
+            <div class="legal-links">
+                <a href="/privacy" data-i18n="privacy">Privacy Policy</a> | 
+                <a href="/terms" data-i18n="terms">Terms of Service</a> |
+                <a href="/cookies" data-i18n="cookies">Cookie Policy</a>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 PFG Chapati. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3 data-i18n="your_cart">Your Cart</h3>
+            <button class="close-cart" aria-label="Close cart"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="cart-items" id="cartItems"></div>
+        
+        <div class="reward-info" id="rewardInfo"></div>
+        
+        <div class="cart-summary">
+            <div class="cart-subtotal">
+                <span data-i18n="subtotal">Subtotal:</span>
+                <span class="subtotal-amount" id="subtotalAmount">0 UGX</span>
+            </div>
+            <div class="cart-discount" id="discountDisplay" style="display: none;">
+                <span data-i18n="discount">Discount:</span>
+                <span id="discountAmount">-0 UGX</span>
+            </div>
+            <div class="cart-delivery-fee" id="deliveryFeeDisplay">
+                <span data-i18n="delivery_fee">Delivery Fee:</span>
+                <span id="deliveryFee">0 UGX</span>
+            </div>
+            <div class="cart-total">
+                <span data-i18n="total">Total:</span>
+                <span class="total-amount" id="totalAmount">0 UGX</span>
+            </div>
+        </div>
+        
+        <!-- Customer Info in Cart - Using consistent IDs with main form -->
+        <div class="cart-customer-info">
+            <h4 data-i18n="delivery_details">Delivery Details</h4>
+            <input type="text" id="cartCustomerName" class="cart-input" placeholder="Your name *" required>
+            <input type="tel" id="cartCustomerPhone" class="cart-input" placeholder="Phone number *" required>
+            <textarea id="cartDeliveryAddress" class="cart-input" placeholder="Delivery address *" required></textarea>
+            <textarea id="cartSpecialInstructions" class="cart-input" placeholder="Special instructions (optional)"></textarea>
+            
+            <!-- Payment Method Selection -->
+            <div class="payment-method-select">
+                <h4 data-i18n="payment_method">Payment Method</h4>
+                <label class="radio-label">
+                    <input type="radio" name="cartPaymentMethod" value="cash" checked>
+                    <span data-i18n="cash_on_delivery">Cash on Delivery</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="cartPaymentMethod" value="mobile_money">
+                    <span data-i18n="mobile_money">Mobile Money</span>
+                </label>
+                <div id="mobileMoneyFields" style="display: none;">
+                    <input type="text" id="mobileMoneyNumber" placeholder="Mobile Money number">
+                    <select id="mobileMoneyProvider">
+                        <option value="mtn">MTN</option>
+                        <option value="airtel">Airtel</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cart-actions">
+            <button class="checkout-btn" id="checkoutBtn" disabled data-i18n="checkout">Proceed to Checkout</button>
+            <button class="whatsapp-btn" id="whatsappCartBtn" disabled>
+                <i class="fab fa-whatsapp"></i> <span data-i18n="whatsapp_order">Order via WhatsApp</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Cart Icon & Overlay -->
+    <div class="cart-icon" id="cartIcon">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-count" id="cartCount">0</span>
+    </div>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
