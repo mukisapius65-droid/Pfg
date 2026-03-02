@@ -949,3 +949,441 @@
             renderVendors(filtered);
         });
             }
+    // -------------------- CUSTOMER ORDERS --------------------
+    async function loadCustomerOrders(status = 'all') {
+        if (!currentUser || !elements.customerOrders) return;
+        try {
+            let query = db.collection('orders').where('userId', '==', currentUser.uid);
+            if (status !== 'all') {
+                query = query.where('status', '==', status);
+            }
+            const snapshot = await query.orderBy('createdAt', 'desc').get();
+            const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderCustomerOrders(orders);
+        } catch (error) {
+            console.error('Error loading orders:', error);
+        }
+    }
+
+    function renderCustomerOrders(orders) {
+        if (!elements.customerOrders) return;
+        if (orders.length === 0) {
+            elements.customerOrders.innerHTML = '<p>No orders found</p>';
+            return;
+        }
+        elements.customerOrders.innerHTML = orders.map(o => `
+            <div class="order-card" data-id="${o.id}">
+                <div class="order-info">
+                    <div class="order-id">Order #${o.id.slice(-6)}</div>
+                    <div class="order-date">${o.createdAt ? new Date(o.createdAt.toDate()).toLocaleString() : ''}</div>
+                    <div class="order-items">${o.items.length} items</div>
+                </div>
+                <div class="order-status status-${o.status}">${translate('status_' + o.status)}</div>
+                <div class="order-total">${formatCurrency(o.total)}</div>
+                <button class="track-order-btn" data-id="${o.id}">${translate('track_order')}</button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.track-order-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                openOrderTracking(btn.dataset.id);
+            });
+        });
+    }
+
+    if (elements.orderTabs) {
+        elements.orderTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                elements.orderTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                loadCustomerOrders(tab.dataset.orderStatus);
+            });
+        });
+    }
+
+    // -------------------- ORDER TRACKING --------------------
+    function openOrderTracking(orderId) {
+        if (!elements.orderTrackingModal) return;
+        elements.orderTrackingModal.style.display = 'block';
+        if (orderListener) orderListener();
+        orderListener = db.collection('orders').doc(orderId).onSnapshot((doc) => {
+            if (doc.exists) {
+                updateTrackingUI(doc.data());
+            }
+        });
+    }
+
+    function closeOrderTracking() {
+        if (elements.orderTrackingModal) elements.orderTrackingModal.style.display = 'none';
+        if (orderListener) {
+            orderListener();
+            orderListener = null;
+        }
+    }
+
+    function updateTrackingUI(order) {
+        const statuses = ['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered'];
+        const currentIndex = statuses.indexOf(order.status);
+        statuses.forEach((status, index) => {
+            const stepEl = document.getElementById(`status${status.charAt(0).toUpperCase() + status.slice(1)}`);
+            if (stepEl) {
+                if (index <= currentIndex) stepEl.classList.add('completed');
+                else stepEl.classList.remove('completed');
+            }
+        });
+
+        if (order.assignedRider && order.status !== 'pending') {
+            elements.riderTracking.style.display = 'block';
+            db.collection('users').doc(order.assignedRider).get().then(riderDoc => {
+                if (riderDoc.exists) {
+                    const rider = riderDoc.data();
+                    elements.riderName.textContent = rider.fullName || 'Rider';
+                    elements.riderPhone.textContent = rider.phone || '';
+                    elements.riderPhoto.src = rider.photo || 'images/default-avatar.png';
+                }
+            });
+            if (!map) {
+                map = L.map('trackingMap').setView([0.3136, 32.5811], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+            }
+            if (order.riderLocation) {
+                if (riderMarker) map.removeLayer(riderMarker);
+                riderMarker = L.marker([order.riderLocation.lat, order.riderLocation.lng]).addTo(map);
+                map.setView([order.riderLocation.lat, order.riderLocation.lng], 15);
+            }
+        } else {
+            elements.riderTracking.style.display = 'none';
+        }
+    }
+
+    document.querySelector('.close-modal')?.addEventListener('click', closeOrderTracking);
+    window.addEventListener('click', (e) => {
+        if (e.target === elements.orderTrackingModal) closeOrderTracking();
+    });
+
+    // -------------------- RIDER DASHBOARD --------------------
+    async function loadRiderDashboard() {
+        if (!currentUser || userRole !== 'rider') return;
+        if (!elements.riderDashboard) return;
+
+        const assignedSnapshot = await db.collection('orders')
+            .where('status', '==', 'assigned')
+            .where('assignedRider', '==', currentUser.uid)
+            .get();
+        const assignedOrders = assignedSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderAssignedOrders(assignedOrders);
+
+        const historySnapshot = await db.collection('orders')
+            .where('status', '==', 'delivered')
+            .where('assignedRider', '==', currentUser.uid)
+            .orderBy('deliveredAt', 'desc')
+            .limit(20)
+            .get();
+        const historyOrders = historySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderDeliveryHistory(historyOrders);
+
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const earningsSnapshot = await db.collection('orders')
+            .where('assignedRider', '==', currentUser.uid)
+            .where('status', '==', 'delivered')
+            .where('deliveredAt', '>=', firebase.firestore.Timestamp.fromDate(today))
+            .get();
+        let earnings = 0;
+        earningsSnapshot.forEach(doc => {
+            earnings += doc.data().deliveryFee || 0;
+        });
+        if (elements.todayEarnings) elements.todayEarnings.textContent = formatCurrency(earnings);
+        if (elements.deliveriesToday) elements.deliveriesToday.textContent = earningsSnapshot.size;
+
+        if (elements.riderOnlineToggle) {
+            elements.riderOnlineToggle.addEventListener('change', async (e) => {
+                const online = e.target.checked;
+                await db.collection('riders').doc(currentUser.uid).set({
+                    online,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            });
+        }
+    }
+
+    function renderAssignedOrders(orders) {
+        if (!elements.assignedOrdersList) return;
+        if (orders.length === 0) {
+            elements.assignedOrdersList.innerHTML = '<p>No assigned orders</p>';
+            return;
+        }
+        elements.assignedOrdersList.innerHTML = orders.map(o => `
+            <div class="order-card">
+                <p>Order #${o.id.slice(-6)} - ${o.customerName}</p>
+                <p>Address: ${o.deliveryAddress}</p>
+                <button class="mark-delivered-btn" data-id="${o.id}">${translate('mark_delivered')}</button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.mark-delivered-btn').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const orderId = btn.dataset.id;
+                await db.collection('orders').doc(orderId).update({
+                    status: 'delivered',
+                    deliveredAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                showNotification(translate('order_delivered'), 'success');
+                loadRiderDashboard();
+            });
+        });
+    }
+
+    function renderDeliveryHistory(orders) {
+        if (!elements.deliveryHistoryList) return;
+        if (orders.length === 0) {
+            elements.deliveryHistoryList.innerHTML = '<p>No delivery history</p>';
+            return;
+        }
+        elements.deliveryHistoryList.innerHTML = orders.map(o => `
+            <div class="history-item">
+                <span>Order #${o.id.slice(-6)}</span>
+                <span>${formatCurrency(o.total)}</span>
+                <span>${o.deliveredAt ? new Date(o.deliveredAt.toDate()).toLocaleDateString() : ''}</span>
+            </div>
+        `).join('');
+    }
+
+    // -------------------- VENDOR DASHBOARD --------------------
+    async function loadVendorDashboard() {
+        if (!currentUser || userRole !== 'vendor') return;
+        if (!elements.vendorDashboard) return;
+
+        const menuSnapshot = await db.collection('menu').where('vendorId', '==', currentUser.uid).get();
+        const vendorMenu = menuSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderVendorMenu(vendorMenu);
+
+        const ordersSnapshot = await db.collection('orders')
+            .where('vendorId', '==', currentUser.uid)
+            .where('status', 'in', ['pending', 'accepted', 'preparing'])
+            .get();
+        const pendingOrders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderVendorOrders(pendingOrders);
+
+        const addForm = document.getElementById('addMenuItemForm');
+        if (addForm) {
+            addForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('itemName').value;
+                const price = parseFloat(document.getElementById('itemPrice').value);
+                const category = document.getElementById('itemCategory').value;
+                const description = document.getElementById('itemDescription').value;
+                const image = document.getElementById('itemImage').value;
+                await db.collection('menu').add({
+                    name, price, category, description, image,
+                    vendorId: currentUser.uid,
+                    available: true
+                });
+                showNotification('Item added', 'success');
+                loadVendorDashboard();
+                addForm.reset();
+            });
+        }
+    }
+
+    function renderVendorMenu(items) {
+        const container = document.getElementById('vendorMenuList');
+        if (!container) return;
+        if (items.length === 0) {
+            container.innerHTML = '<p>No menu items yet. Add one below.</p>';
+            return;
+        }
+        container.innerHTML = items.map(item => `
+            <div class="menu-item">
+                <img src="${item.image || 'https://via.placeholder.com/100'}" width="50">
+                <span>${item.name}</span>
+                <span>${formatCurrency(item.price)}</span>
+                <span>${item.category}</span>
+                <button class="edit-item" data-id="${item.id}">${translate('edit_item')}</button>
+                <button class="delete-item" data-id="${item.id}">${translate('delete_item')}</button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.delete-item').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                if (confirm('Delete item?')) {
+                    await db.collection('menu').doc(btn.dataset.id).delete();
+                    loadVendorDashboard();
+                }
+            });
+        });
+    }
+
+    function renderVendorOrders(orders) {
+        const container = document.getElementById('vendorOrdersList');
+        if (!container) return;
+        if (orders.length === 0) {
+            container.innerHTML = '<p>No pending orders</p>';
+            return;
+        }
+        container.innerHTML = orders.map(o => `
+            <div class="order-card">
+                <p>Order #${o.id.slice(-6)} - ${o.customerName}</p>
+                <p>Items: ${o.items.map(i => `${i.name} x${i.quantity}`).join(', ')}</p>
+                <p>Status: ${o.status}</p>
+                <button class="accept-order" data-id="${o.id}">${translate('accept')}</button>
+                <button class="mark-preparing" data-id="${o.id}">Preparing</button>
+                <button class="mark-ready" data-id="${o.id}">Ready for pickup</button>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.accept-order').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                await db.collection('orders').doc(btn.dataset.id).update({ status: 'accepted' });
+                loadVendorDashboard();
+            });
+        });
+    }
+
+    // -------------------- CACHE DOM ELEMENTS --------------------
+    function cacheElements() {
+        elements.loginBtn = document.getElementById('loginBtn');
+        elements.userInfo = document.getElementById('userInfo');
+        elements.userPhoto = document.getElementById('userPhoto');
+        elements.userName = document.getElementById('userName');
+        elements.logoutBtn = document.getElementById('logoutBtn');
+        elements.roleSelector = document.getElementById('roleSelector');
+        elements.roleSelect = document.getElementById('roleSelect');
+        elements.saveRoleBtn = document.getElementById('saveRoleBtn');
+        elements.langSelect = document.getElementById('langSelect');
+        elements.authModal = document.getElementById('authModal');
+        elements.authClose = document.getElementById('authClose');
+        elements.authTabs = document.querySelectorAll('.auth-tab');
+        elements.authForms = document.querySelectorAll('.auth-form');
+        elements.loginForm = document.getElementById('loginForm');
+        elements.signupForm = document.getElementById('signupForm');
+        elements.forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        elements.resetPasswordForm = document.getElementById('resetPasswordForm');
+        elements.menuGrid = document.getElementById('menuGrid');
+        elements.categoryBtns = document.querySelectorAll('.category-btn');
+        elements.cartSidebar = document.getElementById('cartSidebar');
+        elements.cartItems = document.getElementById('cartItems');
+        elements.cartTotal = document.getElementById('cartTotal');
+        elements.checkoutBtn = document.getElementById('checkoutBtn');
+        elements.detectLocationBtn = document.getElementById('detectLocationBtn');
+        elements.locationStatus = document.getElementById('locationStatus');
+        elements.vendorSearch = document.getElementById('vendorSearch');
+        elements.searchVendorsBtn = document.getElementById('searchVendorsBtn');
+        elements.vendorGrid = document.getElementById('vendorGrid');
+        elements.customerOrders = document.getElementById('customerOrders');
+        elements.orderTabs = document.querySelectorAll('.order-tab');
+        elements.orderTrackingModal = document.getElementById('orderTrackingModal');
+        elements.trackingMap = document.getElementById('trackingMap');
+        elements.riderTracking = document.getElementById('riderTracking');
+        elements.riderPhoto = document.getElementById('riderPhoto');
+        elements.riderName = document.getElementById('riderName');
+        elements.riderPhone = document.getElementById('riderPhone');
+        elements.riderDashboard = document.getElementById('rider-dashboard');
+        elements.riderOnlineToggle = document.getElementById('riderOnlineToggle');
+        elements.todayEarnings = document.getElementById('todayEarnings');
+        elements.deliveriesToday = document.getElementById('deliveriesToday');
+        elements.riderRating = document.getElementById('riderRating');
+        elements.assignedOrdersList = document.getElementById('assignedOrdersList');
+        elements.deliveryHistoryList = document.getElementById('deliveryHistoryList');
+        elements.vendorDashboard = document.getElementById('vendor-dashboard');
+    }
+
+    // -------------------- SETUP EVENT LISTENERS --------------------
+    function setupEventListeners() {
+        if (elements.loginBtn) elements.loginBtn.addEventListener('click', openAuthModal);
+        if (elements.authClose) elements.authClose.addEventListener('click', closeAuthModal);
+        window.addEventListener('click', (e) => {
+            if (e.target === elements.authModal) closeAuthModal();
+        });
+
+        if (elements.authTabs) {
+            elements.authTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-auth-tab');
+                    if (tabName === 'login') showLoginTab();
+                    else if (tabName === 'signup') showSignupTab();
+                });
+            });
+        }
+
+        if (elements.loginForm) {
+            elements.loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                handleLogin(email, password);
+            });
+        }
+
+        if (elements.signupForm) {
+            elements.signupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const confirm = document.getElementById('signupConfirm').value;
+                handleSignup(email, password, confirm);
+            });
+        }
+
+        if (elements.forgotPasswordLink) {
+            elements.forgotPasswordLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                const email = prompt(translate('reset_instructions'));
+                if (email) handlePasswordReset(email);
+            });
+        }
+
+        if (elements.logoutBtn) {
+            elements.logoutBtn.addEventListener('click', async () => {
+                await auth.signOut();
+                showNotification('Logged out', 'success');
+            });
+        }
+
+        if (elements.saveRoleBtn) {
+            elements.saveRoleBtn.addEventListener('click', async () => {
+                if (!currentUser) return;
+                const role = elements.roleSelect.value;
+                await db.collection('users').doc(currentUser.uid).update({ role });
+                userRole = role;
+                elements.roleSelector.style.display = 'none';
+                updateRoleBasedUI();
+                loadUserSpecificData();
+            });
+        }
+
+        if (elements.langSelect) {
+            elements.langSelect.addEventListener('change', (e) => {
+                currentLang = e.target.value;
+                updateUILanguage();
+            });
+        }
+
+        if (elements.categoryBtns) {
+            elements.categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    elements.categoryBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    loadMenu(btn.dataset.category);
+                });
+            });
+        }
+
+        document.querySelector('.mobile-menu-btn')?.addEventListener('click', () => {
+            document.querySelector('nav').classList.toggle('active');
+        });
+    }
+
+    // -------------------- INITIALIZE --------------------
+    document.addEventListener('DOMContentLoaded', () => {
+        cacheElements();
+        setupEventListeners();
+        updateUILanguage();
+        loadMenu('breakfast');
+        if (document.getElementById('vendors').style.display !== 'none') {
+            loadVendors();
+        }
+    });
+})();
