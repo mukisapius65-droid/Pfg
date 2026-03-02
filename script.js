@@ -501,3 +501,166 @@
             order_delivered: 'Obulago bulagiddwa nti butuuse'
         }
     };
+    // -------------------- HELPER FUNCTIONS --------------------
+    function translate(key, params = {}) {
+        let text = translations[currentLang]?.[key] || translations.en[key] || key;
+        for (const [param, value] of Object.entries(params)) {
+            text = text.replace(`{${param}}`, value);
+        }
+        return text;
+    }
+
+    function updateUILanguage() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (key) el.textContent = translate(key);
+        });
+    }
+
+    function showNotification(message, type = 'info') {
+        alert(message);
+    }
+
+    function formatCurrency(amount) {
+        return 'UGX ' + amount.toLocaleString();
+    }
+
+    // -------------------- AUTH FUNCTIONS --------------------
+    async function handleLogin(email, password) {
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+            showNotification(translate('login_success'), 'success');
+            closeAuthModal();
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    }
+
+    async function handleSignup(email, password, confirmPassword) {
+        if (password !== confirmPassword) {
+            showNotification(translate('password_mismatch'), 'error');
+            return;
+        }
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            await userCredential.user.sendEmailVerification();
+            showNotification(translate('signup_success') + ' ' + translate('verify_email'), 'success');
+            closeAuthModal();
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    }
+
+    async function handlePasswordReset(email) {
+        try {
+            await auth.sendPasswordResetEmail(email);
+            showNotification(translate('reset_email_sent'), 'success');
+            closeAuthModal();
+        } catch (error) {
+            showNotification(error.message, 'error');
+        }
+    }
+
+    function openAuthModal() {
+        if (elements.authModal) {
+            elements.authModal.style.display = 'block';
+            showLoginTab();
+        }
+    }
+
+    function closeAuthModal() {
+        if (elements.authModal) {
+            elements.authModal.style.display = 'none';
+            if (document.getElementById('loginEmail')) {
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('signupEmail').value = '';
+                document.getElementById('signupPassword').value = '';
+                document.getElementById('signupConfirm').value = '';
+            }
+        }
+    }
+
+    function showLoginTab() {
+        elements.authTabs.forEach(tab => tab.classList.remove('active'));
+        elements.authForms.forEach(form => form.classList.remove('active'));
+        document.querySelector('[data-auth-tab="login"]').classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+    }
+
+    function showSignupTab() {
+        elements.authTabs.forEach(tab => tab.classList.remove('active'));
+        elements.authForms.forEach(form => form.classList.remove('active'));
+        document.querySelector('[data-auth-tab="signup"]').classList.add('active');
+        document.getElementById('signupForm').classList.add('active');
+    }
+
+    // -------------------- AUTH STATE OBSERVER --------------------
+    auth.onAuthStateChanged(async (user) => {
+        currentUser = user;
+        if (user) {
+            elements.userInfo.style.display = 'flex';
+            elements.loginBtn.style.display = 'none';
+            elements.userName.textContent = user.email.split('@')[0];
+            elements.userPhoto.src = user.photoURL || 'images/default-avatar.png';
+
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
+                userRole = userDoc.data().role || 'customer';
+                if (userDoc.data().role) {
+                    elements.roleSelector.style.display = 'none';
+                } else {
+                    elements.roleSelector.style.display = 'flex';
+                }
+            } else {
+                await db.collection('users').doc(user.uid).set({
+                    email: user.email,
+                    role: 'customer',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                userRole = 'customer';
+                elements.roleSelector.style.display = 'none';
+            }
+
+            updateRoleBasedUI();
+            loadUserSpecificData();
+        } else {
+            elements.userInfo.style.display = 'none';
+            elements.loginBtn.style.display = 'flex';
+            userRole = null;
+            updateRoleBasedUI();
+            if (elements.riderDashboard) elements.riderDashboard.style.display = 'none';
+            if (elements.vendorDashboard) elements.vendorDashboard.style.display = 'none';
+            document.getElementById('my-orders').style.display = 'none';
+        }
+    });
+
+    function updateRoleBasedUI() {
+        document.getElementById('riderLink').style.display = 'none';
+        document.getElementById('vendorLink').style.display = 'none';
+        document.getElementById('ordersLink').style.display = 'none';
+
+        if (currentUser) {
+            if (userRole === 'rider') {
+                document.getElementById('riderLink').style.display = 'block';
+                if (elements.riderDashboard) elements.riderDashboard.style.display = 'block';
+            } else if (userRole === 'vendor') {
+                document.getElementById('vendorLink').style.display = 'block';
+                if (elements.vendorDashboard) elements.vendorDashboard.style.display = 'block';
+            } else {
+                document.getElementById('ordersLink').style.display = 'block';
+                document.getElementById('my-orders').style.display = 'block';
+            }
+        }
+    }
+
+    async function loadUserSpecificData() {
+        if (!currentUser) return;
+        if (userRole === 'customer') {
+            loadCustomerOrders();
+        } else if (userRole === 'rider') {
+            loadRiderDashboard();
+        } else if (userRole === 'vendor') {
+            loadVendorDashboard();
+        }
+                }
