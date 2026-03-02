@@ -1237,3 +1237,123 @@ nav {
     margin-bottom: 1rem;
     color: var(--primary);
 }
+/* ===== VENDOR DASHBOARD ===== */
+.vendor-dashboard {
+    padding: 5rem 0;
+    background: white;
+}
+
+.vendor-menu-management,
+.vendor-orders {
+    background: var(--secondary);
+    padding: 2rem;
+    border-radius: var(--border-radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.vendor-menu-management h3,
+.vendor-orders h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+.vendor-menu-list {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.vendor-menu-list .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: var(--border-radius);
+}
+
+.vendor-menu-list .menu-item img {
+    width: 50px;
+    height: 50px;
+    border-radius: var(--border-radius);
+    object-fit: cover;
+}
+
+.vendor-menu-list .menu-item span {
+    flex: 1;
+}
+
+.edit-item,
+.delete-item {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.edit-item {
+    background: var(--accent);
+    color: var(--text-dark);
+}
+
+.delete-item {
+    background: #dc3545;
+    color: white;
+}
+
+.edit-item:hover,
+.delete-item:hover {
+    transform: scale(1.05);
+    filter: brightness(0.9);
+}
+
+.add-menu-form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    margin-top: 1.5rem;
+}
+
+.add-menu-form h4 {
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+.vendor-orders-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.vendor-orders-list .order-card {
+    background: white;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    display: grid;
+    gap: 0.5rem;
+}
+
+.vendor-orders-list button {
+    margin-right: 0.5rem;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.vendor-orders-list .accept-order {
+    background: #28a745;
+    color: white;
+}
+
+.vendor-orders-list .mark-preparing {
+    background: #ffc107;
+    color: #333;
+}
+
+.vendor-orders-list .mark-ready {
+    background: #17a2b8;
+    color: white;
+}
