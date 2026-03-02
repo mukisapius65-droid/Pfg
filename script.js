@@ -1556,4 +1556,256 @@ const firebaseConfig = {
     }
 
     // -------------------- Order Tracking Modal --------------------
-    async
+    async function openOrderTracking(orderId) {
+        elements.orderTrackingModal.style.display = 'block';
+        const orderDoc = await db.collection('orders').doc(orderId).get();
+        const order = orderDoc.data();
+
+        // Update timeline
+        const steps = ['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered'];
+        steps.forEach(step => {
+            const el = document.getElementById(`status${step.charAt(0).toUpperCase() + step.slice(1)}`);
+            const timeEl = document.getElementById(`${step}Time`);
+            if (order[step + 'At']) {
+                el.classList.add('completed');
+                timeEl.textContent = order[step + 'At'].toDate().toLocaleTimeString();
+            } else {
+                el.classList.remove('completed');
+                timeEl.textContent = '';
+            }
+        });
+
+        // Show rider info if assigned
+        if (order.riderId) {
+            const riderDoc = await db.collection('users').doc(order.riderId).get();
+            const rider = riderDoc.data();
+            elements.riderName.textContent = rider.name;
+            elements.riderPhone.textContent = rider.phone;
+            elements.riderPhoto.src = rider.photoURL || '/images/default-avatar.png';
+            elements.riderTracking.style.display = 'block';
+
+            // Initialize tracking map
+            if (!window.trackingMap) {
+                window.trackingMap = L.map('trackingMap').setView([0.3136, 32.5811], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(window.trackingMap);
+            }
+            // Here you would fetch rider's current location and update marker
+        } else {
+            elements.riderTracking.style.display = 'none';
+        }
+    }
+
+    // -------------------- Profile & Settings --------------------
+    function initProfile() {
+        elements.saveProfileBtn?.addEventListener('click', async () => {
+            if (!currentUser) return;
+            const data = {
+                name: elements.profileName.value,
+                phone: elements.profilePhone.value,
+                address: elements.profileAddress.value,
+                businessName: elements.businessName?.value,
+                businessAddress: elements.businessAddress?.value,
+                businessHours: elements.businessHours?.value,
+                vehicleType: elements.vehicleType?.value,
+                licensePlate: elements.licensePlate?.value
+            };
+            try {
+                await db.collection('users').doc(currentUser.uid).update(data);
+                showMessage('Profile updated', 'success');
+            } catch (error) {
+                showMessage('Update failed', 'error');
+            }
+        });
+
+        elements.changePhotoBtn?.addEventListener('click', () => {
+            // Implement photo upload (optional)
+        });
+
+        elements.changePasswordBtn?.addEventListener('click', () => {
+            auth.sendPasswordResetEmail(currentUser.email)
+                .then(() => showMessage('Password reset email sent', 'success'))
+                .catch(err => showMessage(err.message, 'error'));
+        });
+
+        elements.deleteAccountBtn?.addEventListener('click', async () => {
+            if (confirm('Are you sure? This action is irreversible.')) {
+                try {
+                    await db.collection('users').doc(currentUser.uid).delete();
+                    await currentUser.delete();
+                    showMessage('Account deleted', 'success');
+                } catch (err) {
+                    showMessage(err.message, 'error');
+                }
+            }
+        });
+
+        // Settings language
+        elements.settingsLangSelect?.addEventListener('change', (e) => {
+            updateLanguage(e.target.value);
+        });
+
+        // Notifications (save to localStorage or Firestore)
+        elements.pushNotifications?.addEventListener('change', saveNotificationSettings);
+        elements.smsNotifications?.addEventListener('change', saveNotificationSettings);
+        elements.emailNotifications?.addEventListener('change', saveNotificationSettings);
+    }
+
+    function saveNotificationSettings() {
+        const settings = {
+            push: elements.pushNotifications.checked,
+            sms: elements.smsNotifications.checked,
+            email: elements.emailNotifications.checked
+        };
+        localStorage.setItem('pfgNotifications', JSON.stringify(settings));
+    }
+
+    // -------------------- Ads (Placeholder) --------------------
+    function initAds() {
+        if (!elements.adSpace) return;
+        // Example: load ad from third-party service
+        // For now, show a placeholder
+        elements.adSpace.innerHTML = '<a href="#"><img src="/images/ad-placeholder.jpg" alt="Advertisement"></a>';
+    }
+
+    // -------------------- Smooth Scrolling --------------------
+    function initSmoothScrolling() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    }
+
+    // -------------------- Service Worker Registration --------------------
+    function registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.log('SW failed:', err));
+            });
+        }
+    }
+
+    // -------------------- PWA Install Prompt --------------------
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        setTimeout(() => {
+            if (deferredPrompt) showInstallPromotion();
+        }, 10000);
+    });
+
+    function showInstallPromotion() {
+        const btn = document.createElement('button');
+        btn.innerHTML = '📱 Install PFG Chapati App';
+        btn.className = 'install-pwa-btn';
+        btn.style.cssText = `
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #FF6B35; color: white; border: none; padding: 12px 24px;
+            border-radius: 25px; font-weight: bold; box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+            z-index: 1000; cursor: pointer;
+        `;
+        btn.onclick = async () => {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(outcome);
+            deferredPrompt = null;
+            btn.remove();
+        };
+        document.body.appendChild(btn);
+        setTimeout(() => btn.remove(), 15000);
+    }
+
+    // -------------------- Initialization --------------------
+    document.addEventListener('DOMContentLoaded', () => {
+        initElements();
+
+        // Load saved language
+        const savedLang = localStorage.getItem('pfgLang') || 'en';
+        if (elements.langSelect) elements.langSelect.value = savedLang;
+        updateLanguage(savedLang);
+
+        // Initialize modules
+        initAuth();
+        initMobileMenu();
+        initScrollBehavior();
+        initCategoryTabs();
+        renderMenu('breakfast');
+        initLocationDetection();
+        initSmoothScrolling();
+        initAds();
+        initProfile();
+        registerServiceWorker();
+
+        // Cart event listeners
+        if (elements.cartIcon) elements.cartIcon.addEventListener('click', openCart);
+        if (elements.closeCartBtn) elements.closeCartBtn.addEventListener('click', closeCart);
+        if (elements.overlay) elements.overlay.addEventListener('click', closeCart);
+        document.addEventListener('keydown', (e) => e.key === 'Escape' && closeCart());
+
+        // Checkout
+        if (elements.checkoutBtn) elements.checkoutBtn.addEventListener('click', placeOrder);
+        if (elements.whatsappCartBtn) elements.whatsappCartBtn.addEventListener('click', sendWhatsAppOrder);
+
+        // Language change
+        if (elements.langSelect) {
+            elements.langSelect.addEventListener('change', (e) => updateLanguage(e.target.value));
+        }
+
+        // Vendor search
+        if (elements.searchVendorsBtn) {
+            elements.searchVendorsBtn.addEventListener('click', loadVendors);
+        }
+        if (elements.vendorSearch) {
+            elements.vendorSearch.addEventListener('keypress', (e) => e.key === 'Enter' && loadVendors());
+        }
+
+        // Vendor link
+        document.querySelector('a[href="#vendors"]')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('vendors').style.display = 'block';
+            document.getElementById('vendors').scrollIntoView({ behavior: 'smooth' });
+            loadVendors();
+        });
+
+        // My Orders link
+        document.querySelector('a[href="#my-orders"]')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('my-orders').style.display = 'block';
+            document.getElementById('my-orders').scrollIntoView({ behavior: 'smooth' });
+            loadCustomerOrders('all');
+        });
+
+        // Rider/Vendor dashboards via hash
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#rider-dashboard' && userRole === 'rider') initRiderDashboard();
+            if (window.location.hash === '#vendor-dashboard' && userRole === 'vendor') initVendorDashboard();
+            if (window.location.hash === '#my-orders' && userRole === 'customer') loadCustomerOrders('all');
+        });
+
+        // Close modal
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            });
+        });
+
+        // Initialize order tabs
+        initOrderTabs();
+
+        // Pre-fill cart customer info from profile if available
+        if (elements.cartCustomerName && elements.profileName) {
+            elements.cartCustomerName.value = elements.profileName.value;
+            elements.cartCustomerPhone.value = elements.profilePhone.value;
+            elements.cartDeliveryAddress.value = elements.profileAddress.value;
+        }
+
+        console.log('PFG Chapati initialized');
+    });
+})();
