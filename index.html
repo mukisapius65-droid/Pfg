@@ -387,4 +387,52 @@
         </div>
     </section>
 
-  
+      <!-- ===== VENDOR DASHBOARD ===== -->
+    <section class="vendor-dashboard" id="vendor-dashboard" style="display: none;">
+        <div class="container">
+            <h2 data-i18n="vendor_dashboard">Vendor Dashboard</h2>
+            
+            <!-- Vendor Menu Management -->
+            <div class="vendor-menu-management">
+                <h3 data-i18n="update_menu">Update Menu</h3>
+                <div id="vendorMenuList" class="vendor-menu-list"></div>
+                
+                <!-- Add Menu Item Form -->
+                <form id="addMenuItemForm" class="add-menu-form">
+                    <h4 data-i18n="add_item">Add New Item</h4>
+                    <div class="form-group">
+                        <label for="itemName" data-i18n="item_name">Item Name</label>
+                        <input type="text" id="itemName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemPrice" data-i18n="item_price">Price (UGX)</label>
+                        <input type="number" id="itemPrice" min="0" step="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemCategory" data-i18n="item_category">Category</label>
+                        <select id="itemCategory" required>
+                            <option value="breakfast" data-i18n="breakfast">Breakfast</option>
+                            <option value="lunch" data-i18n="lunch">Lunch</option>
+                            <option value="dinner" data-i18n="dinner">Dinner</option>
+                            <option value="drinks" data-i18n="drinks">Drinks</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemDescription" data-i18n="item_description">Description</label>
+                        <textarea id="itemDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="itemImage" data-i18n="item_image">Image URL</label>
+                        <input type="url" id="itemImage" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <button type="submit" class="auth-submit" data-i18n="add_item">Add Item</button>
+                </form>
+            </div>
+            
+            <!-- Vendor Orders -->
+            <div class="vendor-orders">
+                <h3 data-i18n="pending_orders">Pending Orders</h3>
+                <div id="vendorOrdersList" class="vendor-orders-list"></div>
+            </div>
+        </div>
+                    </section>
