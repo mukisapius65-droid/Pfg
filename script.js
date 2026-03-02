@@ -664,3 +664,288 @@
             loadVendorDashboard();
         }
                 }
+    // -------------------- CART FUNCTIONS --------------------
+    function addToCart(item) {
+        const existing = cart.find(i => i.id === item.id);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            cart.push({ ...item, quantity: 1 });
+        }
+        updateCartUI();
+        showNotification(translate('added_to_cart', { name: item.name }), 'success');
+    }
+
+    function removeFromCart(itemId) {
+        cart = cart.filter(i => i.id !== itemId);
+        updateCartUI();
+    }
+
+    function updateQuantity(itemId, newQuantity) {
+        const item = cart.find(i => i.id === itemId);
+        if (item) {
+            if (newQuantity <= 0) {
+                removeFromCart(itemId);
+            } else {
+                item.quantity = newQuantity;
+            }
+        }
+        updateCartUI();
+    }
+
+    function updateCartUI() {
+        if (!elements.cartItems) return;
+        if (cart.length === 0) {
+            elements.cartItems.innerHTML = `<p class="empty-cart">${translate('empty_cart')}</p>`;
+            if (elements.cartTotal) elements.cartTotal.textContent = formatCurrency(0);
+            return;
+        }
+
+        let html = '';
+        let subtotal = 0;
+        cart.forEach(item => {
+            subtotal += item.price * item.quantity;
+            html += `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <div class="cart-item-price">${formatCurrency(item.price)}</div>
+                    </div>
+                    <div class="cart-item-actions">
+                        <button class="qty-btn minus" data-id="${item.id}">-</button>
+                        <span class="qty">${item.quantity}</span>
+                        <button class="qty-btn plus" data-id="${item.id}">+</button>
+                        <button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+
+        elements.cartItems.innerHTML = html;
+        if (elements.cartTotal) elements.cartTotal.textContent = formatCurrency(subtotal);
+
+        document.querySelectorAll('.minus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                const item = cart.find(i => i.id === id);
+                if (item) updateQuantity(id, item.quantity - 1);
+            });
+        });
+        document.querySelectorAll('.plus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                const item = cart.find(i => i.id === id);
+                if (item) updateQuantity(id, item.quantity + 1);
+            });
+        });
+        document.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                removeFromCart(btn.dataset.id);
+            });
+        });
+    }
+
+    // -------------------- MENU FUNCTIONS --------------------
+    async function loadMenu(category = 'breakfast') {
+        if (!elements.menuGrid) return;
+        elements.menuGrid.innerHTML = Array(6).fill(0).map(() => `
+            <div class="menu-item skeleton">
+                <div style="height:200px; background:#eee;"></div>
+                <div class="menu-item-content">
+                    <div style="height:20px; background:#eee; width:70%; margin-bottom:10px;"></div>
+                    <div style="height:15px; background:#eee; width:90%;"></div>
+                </div>
+            </div>
+        `).join('');
+
+        try {
+            const snapshot = await db.collection('menu').where('category', '==', category).get();
+            menuItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderMenu(menuItems);
+        } catch (error) {
+            console.error('Error loading menu:', error);
+            elements.menuGrid.innerHTML = '<p>Error loading menu</p>';
+        }
+    }
+
+    function renderMenu(items) {
+        if (!elements.menuGrid) return;
+        if (items.length === 0) {
+            elements.menuGrid.innerHTML = '<p>No items in this category</p>';
+            return;
+        }
+        elements.menuGrid.innerHTML = items.map(item => `
+            <div class="menu-item" data-id="${item.id}">
+                <img src="${item.image || 'https://via.placeholder.com/300x200'}" alt="${item.name}">
+                <div class="menu-item-content">
+                    <h3>${item.name}</h3>
+                    <p>${item.description || ''}</p>
+                    <div class="price">
+                        <span>${formatCurrency(item.price)}</span>
+                        <button class="add-to-cart" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}">
+                            <i class="fas fa-cart-plus"></i> ${translate('add_to_cart')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                const name = btn.dataset.name;
+                const price = parseFloat(btn.dataset.price);
+                addToCart({ id, name, price });
+            });
+        });
+    }
+
+    // -------------------- CHECKOUT --------------------
+    if (elements.checkoutBtn) {
+        elements.checkoutBtn.addEventListener('click', async () => {
+            if (!currentUser) {
+                showNotification(translate('login_required'), 'error');
+                openAuthModal();
+                return;
+            }
+            if (cart.length === 0) {
+                showNotification(translate('empty_cart'), 'error');
+                return;
+            }
+
+            const name = prompt(translate('full_name'), '');
+            if (!name) return;
+            const phone = prompt(translate('phone_number'), '');
+            if (!phone) return;
+            const address = prompt(translate('default_address'), '');
+            if (!address) return;
+
+            const paymentMethod = confirm(translate('cash_on_delivery') + '? Click OK for Cash, Cancel for Mobile Money') ? 'cash' : 'mobile_money';
+
+            const orderData = {
+                userId: currentUser.uid,
+                customerName: name,
+                customerPhone: phone,
+                deliveryAddress: address,
+                items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+                subtotal: cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
+                deliveryFee: 2000,
+                total: cart.reduce((sum, i) => sum + i.price * i.quantity, 0) + 2000,
+                paymentMethod,
+                status: 'pending',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                assignedRider: null
+            };
+
+            try {
+                await db.collection('orders').add(orderData);
+                showNotification(translate('order_placed'), 'success');
+                cart = [];
+                updateCartUI();
+                if (typeof toggleCart === 'function') toggleCart();
+            } catch (error) {
+                console.error('Order error:', error);
+                showNotification(translate('order_failed'), 'error');
+            }
+        });
+    }
+
+    // -------------------- VENDOR DIRECTORY --------------------
+    async function loadVendors() {
+        if (!elements.vendorGrid) return;
+        try {
+            const snapshot = await db.collection('vendors').get();
+            vendors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderVendors(vendors);
+        } catch (error) {
+            console.error('Error loading vendors:', error);
+        }
+    }
+
+    function renderVendors(vendorList) {
+        if (!elements.vendorGrid) return;
+        if (vendorList.length === 0) {
+            elements.vendorGrid.innerHTML = '<p>No vendors found</p>';
+            return;
+        }
+        elements.vendorGrid.innerHTML = vendorList.map(v => `
+            <div class="vendor-card">
+                <img src="${v.photo || 'https://via.placeholder.com/300x200'}" alt="${v.name}">
+                <h3>${v.name}</h3>
+                <p>${v.address || ''}</p>
+                <p class="vendor-distance">${v.distance ? translate('km_away', { distance: v.distance.toFixed(1) }) : ''}</p>
+                <div class="vendor-actions">
+                    <button class="call-btn" data-phone="${v.phone}"><i class="fas fa-phone"></i> ${translate('call_now')}</button>
+                    <button class="whatsapp-btn" data-phone="${v.phone}"><i class="fab fa-whatsapp"></i> ${translate('whatsapp_order')}</button>
+                </div>
+            </div>
+        `).join('');
+
+        document.querySelectorAll('.call-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.location.href = `tel:${btn.dataset.phone}`;
+            });
+        });
+        document.querySelectorAll('.whatsapp-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                window.open(`https://wa.me/${btn.dataset.phone}`, '_blank');
+            });
+        });
+    }
+
+    // Location detection
+    if (elements.detectLocationBtn) {
+        elements.detectLocationBtn.addEventListener('click', () => {
+            if (!navigator.geolocation) {
+                elements.locationStatus.textContent = translate('location_failed');
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                    elements.locationStatus.textContent = translate('location_detected');
+                    filterVendorsByDistance();
+                },
+                () => {
+                    elements.locationStatus.textContent = translate('location_failed');
+                }
+            );
+        });
+    }
+
+    function filterVendorsByDistance() {
+        if (!userLocation || !vendors.length) return;
+        const withDistance = vendors.map(v => {
+            if (v.location) {
+                const dist = getDistance(userLocation, v.location);
+                return { ...v, distance: dist };
+            }
+            return v;
+        });
+        withDistance.sort((a, b) => (a.distance || Infinity) - (b.distance || Infinity));
+        renderVendors(withDistance);
+    }
+
+    function getDistance(loc1, loc2) {
+        const R = 6371;
+        const dLat = (loc2.lat - loc1.lat) * Math.PI / 180;
+        const dLon = (loc2.lng - loc1.lng) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(loc1.lat * Math.PI / 180) * Math.cos(loc2.lat * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    }
+
+    if (elements.searchVendorsBtn) {
+        elements.searchVendorsBtn.addEventListener('click', () => {
+            const query = elements.vendorSearch.value.toLowerCase();
+            if (!query) {
+                renderVendors(vendors);
+                return;
+            }
+            const filtered = vendors.filter(v => v.name.toLowerCase().includes(query) || (v.address && v.address.toLowerCase().includes(query)));
+            renderVendors(filtered);
+        });
+            }
