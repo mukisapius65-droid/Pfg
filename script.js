@@ -1029,3 +1029,465 @@ const firebaseConfig = {
         const name = btn.dataset.name;
         const price = parseInt(btn.dataset.price);
         const image = btn.dataset.image;
+
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            cart.push({ id, name, price, image, quantity: 1 });
+        }
+
+        // Beans reward (Kikomando id = 'l1')
+        if (id === 'l1') {
+            rewards.beansCount += 1;
+            rewards.points += 10;
+            if (currentUser) {
+                db.collection('users').doc(currentUser.uid).update({ rewards });
+            }
+        }
+
+        updateCart();
+        saveCartToFirestore();
+        openCart();
+        showMessage(t('added_to_cart', { name }), 'success');
+
+        btn.style.transform = 'scale(0.95)';
+        setTimeout(() => btn.style.transform = 'scale(1)', 150);
+    }
+
+    function openCart() {
+        if (elements.cartSidebar) elements.cartSidebar.classList.add('active');
+        if (elements.overlay) elements.overlay.classList.add('active');
+        isCartOpen = true;
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCart() {
+        if (elements.cartSidebar) elements.cartSidebar.classList.remove('active');
+        if (elements.overlay) elements.overlay.classList.remove('active');
+        isCartOpen = false;
+        document.body.style.overflow = '';
+    }
+
+    function updateCart() {
+        if (!elements.cartItems || !elements.cartCount || !elements.subtotalAmount || !elements.totalAmount) return;
+
+        const subtotal = calculateSubtotal();
+        const delivery = calculateDeliveryFee(subtotal);
+        const discount = parseInt(sessionStorage.getItem('discount') || '0');
+        const total = subtotal + delivery - discount;
+
+        // Render cart items
+        if (cart.length === 0) {
+            elements.cartItems.innerHTML = `<div class="empty-cart"><i class="fas fa-shopping-cart"></i><p>${t('empty_cart')}</p></div>`;
+        } else {
+            elements.cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='/images/placeholder.jpg'">
+                    <div class="cart-item-details">
+                        <h4>${item.name}</h4>
+                        <div class="cart-item-price">${item.price.toLocaleString()} UGX</div>
+                        <div class="cart-item-quantity">
+                            <button class="quantity-btn decrease" data-id="${item.id}">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="quantity-btn increase" data-id="${item.id}">+</button>
+                            <button class="remove-item" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        elements.cartCount.textContent = cart.reduce((sum, i) => sum + i.quantity, 0);
+        elements.subtotalAmount.textContent = `${subtotal.toLocaleString()} UGX`;
+        elements.deliveryFee.textContent = `${delivery.toLocaleString()} UGX`;
+        if (discount > 0) {
+            elements.discountDisplay.style.display = 'flex';
+            elements.discountAmount.textContent = `-${discount.toLocaleString()} UGX`;
+        } else {
+            elements.discountDisplay.style.display = 'none';
+        }
+        elements.totalAmount.textContent = `${total.toLocaleString()} UGX`;
+
+        // Update reward info
+        if (elements.rewardInfo) {
+            if (rewards.points >= 100) {
+                elements.rewardInfo.innerHTML = `
+                    <span>🎉 ${t('points_earned', { points: rewards.points, beansCount: rewards.beansCount })}</span>
+                    <button class="redeem-btn" id="redeemBtn">${t('redeem')}</button>
+                `;
+                document.getElementById('redeemBtn')?.addEventListener('click', () => {
+                    if (rewards.points >= 100) {
+                        sessionStorage.setItem('discount', '1000');
+                        rewards.points -= 100;
+                        if (currentUser) {
+                            db.collection('users').doc(currentUser.uid).update({ rewards });
+                        }
+                        updateCart();
+                        showMessage(t('discount_applied'), 'success');
+                    }
+                });
+            } else if (rewards.points > 0) {
+                elements.rewardInfo.innerHTML = `🎉 ${t('points_earned', { points: rewards.points, beansCount: rewards.beansCount })}`;
+            } else {
+                elements.rewardInfo.innerHTML = '';
+            }
+        }
+
+        // Update cart buttons state
+        const isEmpty = cart.length === 0;
+        elements.checkoutBtn.disabled = isEmpty;
+        elements.whatsappCartBtn.disabled = isEmpty;
+
+        // Attach quantity events
+        document.querySelectorAll('.decrease').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                const item = cart.find(i => i.id === id);
+                if (item) {
+                    if (item.quantity > 1) {
+                        item.quantity -= 1;
+                    } else {
+                        cart = cart.filter(i => i.id !== id);
+                    }
+                    updateCart();
+                    saveCartToFirestore();
+                }
+            });
+        });
+        document.querySelectorAll('.increase').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                const item = cart.find(i => i.id === id);
+                if (item) {
+                    item.quantity += 1;
+                    updateCart();
+                    saveCartToFirestore();
+                }
+            });
+        });
+        document.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                cart = cart.filter(i => i.id !== id);
+                updateCart();
+                saveCartToFirestore();
+            });
+        });
+    }
+
+    // -------------------- Checkout (Firebase) --------------------
+    async function placeOrder() {
+        if (!currentUser) {
+            showMessage(t('login_required'), 'error');
+            return;
+        }
+        if (cart.length === 0) return;
+
+        const name = elements.cartCustomerName.value.trim();
+        const phone = elements.cartCustomerPhone.value.trim();
+        const address = elements.cartDeliveryAddress.value.trim();
+        if (!name || !phone || !address) {
+            showMessage(t('fill_details'), 'error');
+            return;
+        }
+
+        showLoading(true);
+        const subtotal = calculateSubtotal();
+        const delivery = calculateDeliveryFee(subtotal);
+        const discount = parseInt(sessionStorage.getItem('discount') || '0');
+        const total = subtotal + delivery - discount;
+
+        const orderData = {
+            userId: currentUser.uid,
+            items: cart,
+            subtotal,
+            deliveryFee: delivery,
+            discountApplied: discount,
+            total,
+            customer: {
+                name,
+                phone,
+                address,
+                instructions: elements.cartSpecialInstructions.value
+            },
+            rewards: { ...rewards },
+            status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        try {
+            await db.collection('orders').add(orderData);
+            // Clear cart
+            cart = [];
+            sessionStorage.removeItem('discount');
+            updateCart();
+            await saveCartToFirestore();
+            closeCart();
+            showMessage(t('order_placed'), 'success');
+        } catch (error) {
+            console.error('Order error:', error);
+            showMessage(t('order_failed'), 'error');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    // -------------------- WhatsApp Order (fallback) --------------------
+    function sendWhatsAppOrder() {
+        if (cart.length === 0) return;
+        const phone = '256703055329'; // Your WhatsApp number
+        const itemsText = cart.map(i => `${i.quantity}x ${i.name} @ ${i.price} UGX`).join('%0A');
+        const subtotal = calculateSubtotal();
+        const delivery = calculateDeliveryFee(subtotal);
+        const total = subtotal + delivery;
+        const name = elements.cartCustomerName.value || 'Not provided';
+        const phoneNum = elements.cartCustomerPhone.value || 'Not provided';
+        const address = elements.cartDeliveryAddress.value || 'Not provided';
+        const message = `New Order from PFG Chapati:%0A%0A${itemsText}%0A%0ASubtotal: ${subtotal} UGX%0ADelivery: ${delivery} UGX%0ATotal: ${total} UGX%0A%0ACustomer: ${name}%0APhone: ${phoneNum}%0AAddress: ${address}`;
+        window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+    }
+
+    // -------------------- Location Detection & Vendors --------------------
+    function initLocationDetection() {
+        if (!elements.detectLocationBtn) return;
+        elements.detectLocationBtn.addEventListener('click', () => {
+            if (navigator.geolocation) {
+                showLoading(true);
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                        elements.locationStatus.textContent = t('location_detected');
+                        showLoading(false);
+                        loadVendors();
+                    },
+                    err => {
+                        elements.locationStatus.textContent = t('location_failed');
+                        showLoading(false);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                alert('Geolocation not supported');
+            }
+        });
+    }
+
+    async function loadVendors() {
+        if (!elements.vendorGrid) return;
+        showLoading(true);
+        try {
+            const snapshot = await db.collection('vendors').get();
+            let vendors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const searchTerm = elements.vendorSearch?.value.toLowerCase() || '';
+            if (searchTerm) {
+                vendors = vendors.filter(v => 
+                    v.name?.toLowerCase().includes(searchTerm) || 
+                    v.location?.toLowerCase().includes(searchTerm)
+                );
+            }
+            if (userLocation) {
+                vendors.forEach(v => {
+                    if (v.coords) {
+                        v.distance = getDistance(userLocation, v.coords);
+                    } else {
+                        v.distance = Infinity;
+                    }
+                });
+                vendors.sort((a, b) => a.distance - b.distance);
+            }
+            renderVendors(vendors);
+        } catch (error) {
+            console.error('Error loading vendors:', error);
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function renderVendors(vendors) {
+        if (!elements.vendorGrid) return;
+        if (vendors.length === 0) {
+            elements.vendorGrid.innerHTML = '<p class="no-results">No vendors found</p>';
+            return;
+        }
+        elements.vendorGrid.innerHTML = vendors.map(v => `
+            <div class="vendor-card">
+                <div class="vendor-image">
+                    <img src="${v.image || '/images/vendor-placeholder.jpg'}" alt="${v.name}" loading="lazy">
+                    <span class="rating-badge">⭐ ${v.rating || '4.5'}</span>
+                </div>
+                <div class="vendor-info">
+                    <h3>${v.name}</h3>
+                    <p class="vendor-location">📍 ${v.location || 'Kampala'}</p>
+                    <p class="vendor-price">UGX ${v.pricePerChapati || 1000} per chapati</p>
+                    ${v.distance ? `<p class="vendor-distance">${t('km_away', { distance: v.distance.toFixed(1) })}</p>` : ''}
+                    <button class="order-from-vendor" data-id="${v.id}">${t('order_now')}</button>
+                </div>
+            </div>
+        `).join('');
+        document.querySelectorAll('.order-from-vendor').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('menu').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    }
+
+    // -------------------- Rider Dashboard --------------------
+    async function initRiderDashboard() {
+        if (!currentUser || userRole !== 'rider') return;
+
+        // Initialize map
+        if (elements.riderMap && !map) {
+            map = L.map('riderMap').setView([0.3136, 32.5811], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+        }
+
+        // Load rider stats
+        loadRiderStats();
+
+        // Listen for assigned orders
+        if (orderListener) orderListener();
+        orderListener = db.collection('orders')
+            .where('status', 'in', ['pending', 'assigned'])
+            .onSnapshot(snapshot => {
+                updateRiderOrders(snapshot);
+            }, error => console.error('Order listener error:', error));
+
+        // Online/offline toggle
+        elements.riderOnlineToggle?.addEventListener('change', async (e) => {
+            const online = e.target.checked;
+            elements.riderStatusText.textContent = online ? t('online') : t('offline');
+            if (currentUser) {
+                await db.collection('riders').doc(currentUser.uid).set({
+                    online,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }
+        });
+    }
+
+    async function loadRiderStats() {
+        if (!currentUser) return;
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+
+        // Total earnings
+        const earningsSnap = await db.collection('riders').doc(currentUser.uid).get();
+        if (earningsSnap.exists) {
+            const data = earningsSnap.data();
+            elements.totalEarnings.textContent = `UGX ${(data.earnings || 0).toLocaleString()}`;
+            elements.riderRating.textContent = `⭐ ${(data.rating || 0).toFixed(1)}`;
+        }
+
+        // Today's earnings and deliveries
+        const todayOrders = await db.collection('orders')
+            .where('riderId', '==', currentUser.uid)
+            .where('deliveredAt', '>=', todayTimestamp)
+            .get();
+        let todayEarnings = 0;
+        todayOrders.forEach(doc => {
+            todayEarnings += doc.data().total * 0.1; // 10% commission
+        });
+        elements.todayEarnings.textContent = `UGX ${todayEarnings.toLocaleString()}`;
+        elements.deliveriesToday.textContent = todayOrders.size;
+    }
+
+    function updateRiderOrders(snapshot) {
+        if (!elements.assignedOrders) return;
+        elements.assignedOrders.innerHTML = '';
+        snapshot.forEach(doc => {
+            const order = doc.data();
+            const orderId = doc.id;
+            const card = document.createElement('div');
+            card.className = 'order-card';
+            card.innerHTML = `
+                <h4>Order #${orderId.slice(0,6)}</h4>
+                <p><strong>${t('customer')}:</strong> ${order.customer?.name}</p>
+                <p><strong>${t('phone_number')}:</strong> ${order.customer?.phone}</p>
+                <p><strong>${t('default_address')}:</strong> ${order.customer?.address}</p>
+                <p><strong>${t('total')}:</strong> UGX ${order.total}</p>
+                <p><strong>${t('status_pending')}:</strong> <span class="status status-${order.status}">${t('status_' + order.status)}</span></p>
+                <div class="order-actions">
+                    ${order.status === 'pending' ? `<button class="accept-order" data-id="${orderId}">${t('accept')}</button>` : ''}
+                    ${order.status === 'assigned' && order.riderId === currentUser?.uid ? `<button class="complete-order" data-id="${orderId}">${t('mark_delivered')}</button>` : ''}
+                </div>
+            `;
+            elements.assignedOrders.appendChild(card);
+        });
+
+        document.querySelectorAll('.accept-order').forEach(btn => {
+            btn.addEventListener('click', async e => {
+                const orderId = e.target.dataset.id;
+                try {
+                    await db.collection('orders').doc(orderId).update({
+                        status: 'assigned',
+                        riderId: currentUser.uid,
+                        acceptedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    showMessage('Order accepted', 'success');
+                } catch (error) {
+                    showMessage('Failed to accept order', 'error');
+                }
+            });
+        });
+
+        document.querySelectorAll('.complete-order').forEach(btn => {
+            btn.addEventListener('click', async e => {
+                const orderId = e.target.dataset.id;
+                try {
+                    await db.collection('orders').doc(orderId).update({
+                        status: 'delivered',
+                        deliveredAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    // Add earnings
+                    const orderDoc = await db.collection('orders').doc(orderId).get();
+                    const order = orderDoc.data();
+                    const earnings = order.total * 0.1;
+                    await db.collection('riders').doc(currentUser.uid).set({
+                        earnings: firebase.firestore.FieldValue.increment(earnings),
+                        deliveries: firebase.firestore.FieldValue.increment(1)
+                    }, { merge: true });
+                    loadRiderStats();
+                    showMessage('Order delivered!', 'success');
+                } catch (error) {
+                    showMessage('Failed to update order', 'error');
+                }
+            });
+        });
+    }
+
+    // -------------------- Vendor Dashboard --------------------
+    function initVendorDashboard() {
+        if (!currentUser || userRole !== 'vendor') return;
+        loadVendorStats();
+        db.collection('orders')
+            .where('vendorId', '==', currentUser.uid)
+            .onSnapshot(snapshot => {
+                updateVendorOrders(snapshot);
+            });
+    }
+
+    async function loadVendorStats() {
+        if (!currentUser) return;
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+
+        const ordersToday = await db.collection('orders')
+            .where('vendorId', '==', currentUser.uid)
+            .where('createdAt', '>=', todayTimestamp)
+            .get();
+        let totalSales = 0;
+        let pending = 0;
+        ordersToday.forEach(doc => {
+            totalSales += doc.data().total;
+            if (doc.data().status === 'pending') pending++;
+        });
+        elements.vendorTodayOrders.textContent = ordersToday.size;
+        elements.vendorTotalSales.textContent = `UGX ${totalSales.toLocaleString()}`;
+        elements.vendorPendingOrders.textContent = pending;
+
+        const vendorDoc = await db.collection('vendors').doc(currentUse
