@@ -1061,12 +1061,56 @@ const firebaseConfig = {
         document.body.style.overflow = 'hidden';
     }
 
-    function closeCart() {
-        if (elements.cartSidebar) elements.cartSidebar.classList.remove('active');
-        if (elements.overlay) elements.overlay.classList.remove('active');
-        isCartOpen = false;
+    // ===== FIX: Robust Cart Close Button =====
+// This ensures the close button works even if other listeners fail
+const closeCartBtn = document.querySelector('.close-cart');
+const cartSidebar = document.getElementById('cartSidebar');
+const overlay = document.getElementById('overlay');
+
+if (closeCartBtn) {
+    // Remove any existing listeners to prevent duplicates, then add a fresh one
+    closeCartBtn.replaceWith(closeCartBtn.cloneNode(true));
+    const newCloseBtn = document.querySelector('.close-cart');
+    
+    newCloseBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('Close button clicked'); // For debugging
+        
+        // Force close the cart
+        if (cartSidebar) {
+            cartSidebar.classList.remove('active');
+        }
+        if (overlay) {
+            overlay.classList.remove('active');
+        }
+        
+        // Reset body overflow
         document.body.style.overflow = '';
-    }
+        
+        // Update global state
+        if (typeof isCartOpen !== 'undefined') {
+            isCartOpen = false;
+        }
+    });
+    
+    console.log('✅ Cart close button fixed');
+}
+
+// Also ensure the overlay click closes the cart
+if (overlay) {
+    overlay.addEventListener('click', function() {
+        if (cartSidebar) {
+            cartSidebar.classList.remove('active');
+        }
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        if (typeof isCartOpen !== 'undefined') {
+            isCartOpen = false;
+        }
+    });
+                       }
 
     function updateCart() {
         if (!elements.cartItems || !elements.cartCount || !elements.subtotalAmount || !elements.totalAmount) return;
